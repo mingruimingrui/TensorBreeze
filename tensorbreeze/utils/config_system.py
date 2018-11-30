@@ -1,6 +1,7 @@
 """
 A helper class for helping to create config.py files
 """
+
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
