@@ -11,11 +11,14 @@ import tqdm
 
 import numpy as np
 
+import torch
+import torch.utils.data
+
 from ...utils import mask as utils_mask
 from ...utils.image_io import read_image, get_image_size
 
 
-class DetectionDataset(object):
+class DetectionDataset(torch.utils.data.Dataset):
     def __init__(
         self,
         image_files,
