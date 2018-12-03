@@ -8,7 +8,7 @@ data_format = 'channels_first'
 
 def add_fpn_ops(input_features, config_file=None, **kwargs):
     """
-    FPN layer as defined in https://arxiv.org/abs/1612.03144
+    FPN as defined in https://arxiv.org/abs/1612.03144
     """
     config = make_config(config_file, **kwargs)
 
