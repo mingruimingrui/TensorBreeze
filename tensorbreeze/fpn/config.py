@@ -14,17 +14,8 @@ config = _C
 # FPN options
 # --------------------------------------------------------------------------- #
 
-# The channel sizes of the input features of levels 2 to an implied
-# MAX_INPUT_LEVEL
-#
-# If len(BACKBONE_CHANNEL_SIZES) == 4, it will be assumed that the
-# MAX_INPUT_LEVEL is 5 (since the channel sizes will represent the level
-# [2, 3, 4, 5] feature levels)
-#
-# Similarly if len(BACKBONE_CHANNEL_SIZES) == 3, the MAX_INPUT_LEVEL will be
-# assumed to be 4
-#
-# The default values are assuming resnet50 at feature levels 2-5
+# This argument is never actually used, but will be used in Kindler and
+# CaffeBrewer
 _C.BACKBONE_CHANNEL_SIZES = [256, 512, 1024, 2048]
 
 # The minimum input feature level
