@@ -18,7 +18,8 @@ def anchor(
     ratios=[0.5, 1., 2.],
     scales=[2. ** 0., 2. ** (1. / 3.), 2. ** (2. / 3.)],
     size=32,
-    stride=8
+    stride=8,
+    name=None
 ):
     """
     Anchor generator for a single feature level
@@ -28,7 +29,9 @@ def anchor(
     anchors_at_window = utils_anchors.generate_anchors_at_window(
         base_size=size,
         ratios=ratios,
-        scales=scales
+        scales=scales,
+        name=name,
+        as_variable=True
     )
     return utils_anchors.shift_anchors(
         feature_shape,
@@ -44,7 +47,8 @@ def compute_anchors(
     min_feature_level=2,
     size_mult=4.0,
     stride_mult=1.0,
-    data_format='channels_first'
+    data_format='channels_first',
+    name='compute_anchors'
 ):
     """
     Multi level feature generator
@@ -52,27 +56,30 @@ def compute_anchors(
     """
     assert data_format in {'channels_first', 'channels_last'}
 
-    scales = [2 ** (i / scales_per_octave) for i in range(scales_per_octave)]
-    all_anchor_levels = range(min_feature_level, min_feature_level + len(features))
+    with tf.variable_scope('{}/anchor'.format(name)):
+        scales = [2 ** (i / scales_per_octave) for i in range(scales_per_octave)]
+        all_anchor_levels = range(min_feature_level, min_feature_level + len(features))
 
-    anchors = dict()
-    for level, feature in enumerate(features, min_feature_level):
-        size = size_mult * (2 ** level)
-        stride = stride_mult * (2 ** level)
+        anchors = dict()
+        for level, feature in enumerate(features, min_feature_level):
+            size = size_mult * (2 ** level)
+            stride = stride_mult * (2 ** level)
 
-        feature_shape = tf.shape(feature)
+            feature_shape = tf.shape(feature)
 
-        if data_format == 'channels_first':
-            feature_shape = feature_shape[-2:]
-        else:
-            feature_shape = feature_shape[1:3]
+            if data_format == 'channels_first':
+                feature_shape = feature_shape[-2:]
+            else:
+                feature_shape = feature_shape[1:3]
 
-        anchors[level] = anchor(
-            feature_shape,
-            ratios=ratios,
-            scales=scales,
-            size=size,
-            stride=stride
-        )
+            anchors[level] = anchor(
+                feature_shape,
+                ratios=ratios,
+                scales=scales,
+                size=size,
+                stride=stride,
+                name='{}/anchors'.format(level)
+            )
 
-    return [anchors[level] for level in all_anchor_levels]
+    anchors = [anchors[level] for level in all_anchor_levels]
+    return tf.concat(anchors, axis=0, name='{}/out'.format(name))
