@@ -55,6 +55,11 @@ def combine_contexts(*args):
             yield [first_context]
 
 
+@contextlib.contextmanager
+def Dummy(*args, **kwargs):
+    yield None
+
+
 # @contextlib.contextmanager
 # def Session(target='', graph=None, config=None, allow_growth=True):
 #     if config is None:
