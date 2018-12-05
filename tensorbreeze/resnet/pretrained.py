@@ -4,7 +4,6 @@ import torchvision
 import tensorflow as tf
 
 from .config import valid_resnet_types
-from ..utils.torch_to_tf import convert_state_dict
 from ..utils.weights_io import load_weights_from_state_dict
 
 logger = logging.getLogger(__name__)
@@ -38,7 +37,6 @@ def load_pretrained_weights(resnet_type, sess=None, verbosity=0):
     torch_model_fn = getattr(torchvision.models, resnet_type)
     torch_model = torch_model_fn(pretrained=True)
     torch_state_dict = torch_model.state_dict()
-    tf_state_dict = convert_state_dict(torch_state_dict)
 
     # Load weights into sess
-    load_weights_from_state_dict(tf_state_dict, sess)
+    load_weights_from_state_dict(torch_state_dict, sess)
