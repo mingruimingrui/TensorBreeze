@@ -43,6 +43,8 @@ class DetectionSampler(torch.utils.data.sampler.BatchSampler):
         """
         assert isinstance(dataset, (ConcatDataset, DetectionDataset))
         assert group_method in {'ratio', 'random', 'none'}
+        if random_sample and num_iter is None:
+            num_iter = len(dataset) // batch_size
         if num_iter is not None:
             assert num_iter > 0
 
