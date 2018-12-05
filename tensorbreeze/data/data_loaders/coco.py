@@ -91,14 +91,15 @@ def make_coco_data_loader(
 def enqueue_thread_main(
     sess,
     enqueue_op,
+    enqueue_shape_op,
     data_loader,
     image_placeholder,
-    annotation_placeholders
+    annotation_placeholders,
 ):
     for batch in data_loader:
         feed_dict = dict(zip(annotation_placeholders, batch['annotations']))
         feed_dict[image_placeholder] = batch['image']
-        sess.run(enqueue_op, feed_dict=feed_dict)
+        sess.run([enqueue_op, enqueue_shape_op], feed_dict=feed_dict)
 
 
 def add_coco_loader_ops(
@@ -133,7 +134,7 @@ def add_coco_loader_ops(
         random_vertical_flip=random_vertical_flip
     )
 
-    # Create placeholder tensors to
+    # Create placeholder tensors
     image_placeholder = tf.placeholder(
         dtype=tf.float32,
         shape=(batch_size, 3, None, None)
@@ -144,26 +145,52 @@ def add_coco_loader_ops(
     ) for i in range(batch_size)]
     input_placeholders = [image_placeholder] + annotation_placeholders
 
+    # Create queues
     batch_queue = tf.FIFOQueue(
         capacity=2,
         dtypes=(tf.float32,) * len(input_placeholders)
     )
-    enqueue_op = batch_queue.enqueue(input_placeholders)
+    batch_queue.size()
+    image_shape_queue = tf.FIFOQueue(
+        capacity=2,
+        dtypes=tf.int32,
+        shapes=(4,)
+    )
+    image_shape_queue.size()
 
+    # Create enqueue ops
+    enqueue_op = batch_queue.enqueue(input_placeholders)
+    enqueue_shape_op = image_shape_queue.enqueue(tf.shape(image_placeholder))
+
+    # Start enqueue threads
     t = threading.Thread(target=enqueue_thread_main, kwargs={
         'sess': sess,
         'enqueue_op': enqueue_op,
+        'enqueue_shape_op': enqueue_shape_op,
         'data_loader': data_loader,
         'image_placeholder': image_placeholder,
-        'annotation_placeholders': annotation_placeholders
+        'annotation_placeholders': annotation_placeholders,
     })
     t.setDaemon(True)
     t.start()
 
+    # Create dequeue + reshape ops
     input_tensors = batch_queue.dequeue()
+    image_shape_tensor = image_shape_queue.dequeue()
+
+    image_tensor = tf.reshape(
+        input_tensors[0],
+        [image_shape_tensor[0], 3, image_shape_tensor[2], image_shape_tensor[3]]
+    )
+    annotations_tensor = [
+        tf.reshape(ann, [-1, 5])
+        for ann in input_tensors[1:]
+    ]
+
+    # Return batch
     return {
-        'image': input_tensors[0],
-        'annotations': input_tensors[1:]
+        'image': image_tensor,
+        'annotations': annotations_tensor
     }
 
 
