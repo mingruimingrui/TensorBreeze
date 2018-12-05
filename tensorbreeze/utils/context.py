@@ -3,6 +3,7 @@ Helper functions for working with tf contexts
 """
 
 import contextlib
+import tensorflow as tf
 
 
 @contextlib.contextmanager
@@ -60,14 +61,14 @@ def Dummy(*args, **kwargs):
     yield None
 
 
-# @contextlib.contextmanager
-# def Session(target='', graph=None, config=None, allow_growth=True):
-#     if config is None:
-#         config = tf.ConfigProto()
-#     if allow_growth:
-#         config.gpu_options.allow_growth = True
-#     with tf.Session(target=target, graph=graph, config=config) as sess:
-#         yield sess
+@contextlib.contextmanager
+def Session(target='', graph=None, config=None, allow_growth=True):
+    if config is None:
+        config = tf.ConfigProto()
+    if allow_growth:
+        config.gpu_options.allow_growth = True
+    with tf.Session(target=target, graph=graph, config=config) as sess:
+        yield sess
 
 
 # @contextlib.contextmanager
