@@ -2,12 +2,14 @@
 Helper functions to assist in conversion of pytorch models into TensorBreeze
 models
 """
+from __future__ import absolute_import
+
 from collections import OrderedDict
 import tensorflow as tf
 
 TORCH_DELIMITER = '.'
 TF_DELIMITER = '/'
-TF_ENDING = ':0'
+TF_POSTFIX = ':0'
 
 ext_map = {
     'weight': 'kernel',
@@ -21,6 +23,23 @@ bn_ext_map = {
     'running_var': 'moving_variance',
     'num_batches_tracked': 'num_batches_tracked'
 }
+
+
+def split_base_ext(name, delim=TORCH_DELIMITER):
+    """
+    Splits a name by a delimitter then splits the returning list into
+    basename (as list) and ext
+    """
+    name_split = name.split(delim)
+    return name_split[:-1], name_split[-1]
+
+
+def reorder_kernel_weight(torch_weight):
+    """ Reorder a torch kernel weight into a tf format """
+    len_shape = len(torch_weight.shape)
+    transpose_target = list(range(len_shape))
+    transpose_target = transpose_target[2:] + transpose_target[:2][::-1]
+    return torch_weight.transpose(transpose_target)
 
 
 def check_if_bn(torch_name, torch_state_dict):
@@ -37,23 +56,6 @@ def check_if_kernel(torch_name, torch_state_dict):
     return ext == 'weight'
 
 
-def reorder_kernel_weight(torch_weight):
-    """ Reorder a torch kernel weight into a tf format """
-    len_shape = len(torch_weight.shape)
-    transpose_target = list(range(len_shape))
-    transpose_target = transpose_target[2:] + transpose_target[:2][::-1]
-    return torch_weight.transpose(transpose_target)
-
-
-def split_base_ext(name, delim=TORCH_DELIMITER):
-    """
-    Splits a name by a delimitter then splits the returning list into
-    basename (as list) and ext
-    """
-    name_split = name.split(delim)
-    return name_split[:-1], name_split[-1]
-
-
 def convert_name(torch_name, scoped=True, is_bn=False):
     """
     Converts a torch variable name into a TensorBreeze name
@@ -66,9 +68,12 @@ def convert_name(torch_name, scoped=True, is_bn=False):
     if is_bn:
         tf_ext = bn_ext_map[torch_ext]
     else:
-        tf_ext = ext_map[torch_ext]
+        if torch_ext in ext_map:
+            tf_ext = ext_map[torch_ext]
+        else:
+            tf_ext = torch_ext
 
-    tf_name = TF_DELIMITER.join(basename + [tf_ext]) + TF_ENDING
+    tf_name = TF_DELIMITER.join(basename + [tf_ext]) + TF_POSTFIX
 
     if scoped:
         scope_name = tf.get_variable_scope().name
