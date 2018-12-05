@@ -13,6 +13,7 @@ from ._loss import (
     add_target_ops,
     add_loss_ops
 )
+from ._filter_detections import filter_detections
 
 data_format = 'channels_first'
 
@@ -115,6 +116,30 @@ def add_retinanet_train_ops(image_tensor, annotations_tensors, config_file=None,
     return loss_dict, config
 
 
-def add_retinanet_eval_ops(x, config_file=None, **kwargs):
+def add_retinanet_eval_ops(x, batch_size, config_file=None, **kwargs):
+    """
+    Due to how TensorFlow works, the optimal speed is achieved when the batch
+    size is known
+    """
     (anchors, cls_output, reg_output), config = \
         add_retinanet_ops(x, config_file=None, **kwargs)
+
+    assert isinstance(batch_size, int)
+
+    detections = filter_detections(
+        anchors,
+        cls_output,
+        reg_output,
+        batch_size=batch_size,
+        num_classes=config.TARGET.NUM_CLASSES,
+        apply_nms=config.EVAL.APPLY_NMS,
+        class_specific_nms=config.EVAL.CLASS_SPECIFIC_NMS,
+        pre_nms_top_n=config.EVAL.PRE_NMS_TOP_N,
+        post_nms_top_n=config.EVAL.POST_NMS_TOP_N,
+        nms_thresh=config.EVAL.NMS_THRESH,
+        score_thresh=config.EVAL.SCORE_THRESH,
+        bg_thresh=config.EVAL.BG_THRESH,
+        use_bg_predictor=config.TARGET.BG_PREDICTOR
+    )
+
+    return detections, config
