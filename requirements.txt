@@ -1,0 +1,7 @@
+setuptools
+cython
+future
+pyyaml
+numpy
+tqdm
+requests
