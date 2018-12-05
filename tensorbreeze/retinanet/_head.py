@@ -62,7 +62,6 @@ def comb_head(
         name='head/{}'.format(num_layers * 2),
         reuse=reuse
     )
-    x = tf.sigmoid(x)
 
     # Perform some surgery to extract the classification and regression
     # outputs (and background output)
@@ -84,7 +83,7 @@ def comb_head(
     regression = tf.reshape(regression, [batch_size, -1, total_num_bbox])
     if use_bg_predictor:
         background = tf.reshape(background, [batch_size, -1, 1])
-        classification = tf.concat([classification, background], dim=-1)
+        classification = tf.concat([classification, background], axis=-1)
 
     return classification, regression
 
@@ -123,8 +122,8 @@ def add_comb_head_ops(
         reg_output.append(regression)
         reuse = True
 
-    cls_output = tf.concat(cls_output, axis=0, name='cls_output')
-    reg_output = tf.concat(reg_output, axis=0, name='reg_output')
+    cls_output = tf.concat(cls_output, axis=1, name='cls_output')
+    reg_output = tf.concat(reg_output, axis=1, name='reg_output')
 
     return cls_output, reg_output
 
@@ -182,7 +181,6 @@ def cls_head(
         name='head/{}'.format(num_layers * 2),
         reuse=reuse
     )
-    x = tf.sigmoid(x)
 
     # Perform some surgery to extract the classification outputs
     # (and background output)
@@ -200,7 +198,7 @@ def cls_head(
     classification = tf.reshape(classification, [batch_size, -1, num_classes])
     if use_bg_predictor:
         background = tf.reshape(background, [batch_size, -1, 1])
-        classification = tf.concat([classification, background], dim=-1)
+        classification = tf.concat([classification, background], axis=-1)
 
     return classification
 
@@ -235,7 +233,7 @@ def add_cls_head_ops(
         cls_output.append(classification)
         reuse = True
 
-    cls_output = tf.concat(cls_output, axis=0, name='cls_output')
+    cls_output = tf.concat(cls_output, axis=1, name='cls_output')
 
     return cls_output
 
@@ -290,7 +288,6 @@ def reg_head(
         name='head/{}'.format(num_layers * 2),
         reuse=reuse
     )
-    x = tf.sigmoid(x)
 
     # Perform some surgery to extract the regression outputs
     regression = x
@@ -333,6 +330,6 @@ def add_reg_head_ops(
         reg_output.append(regression)
         reuse = True
 
-    reg_output = tf.concat(reg_output, axis=0, name='reg_output')
+    reg_output = tf.concat(reg_output, axis=1, name='reg_output')
 
     return reg_output
