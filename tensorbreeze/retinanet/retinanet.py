@@ -122,7 +122,7 @@ def add_retinanet_eval_ops(x, batch_size, config_file=None, **kwargs):
     size is known
     """
     (anchors, cls_output, reg_output), config = \
-        add_retinanet_ops(x, config_file=None, **kwargs)
+        add_retinanet_ops(x, config_file, **kwargs)
 
     assert isinstance(batch_size, int)
 
