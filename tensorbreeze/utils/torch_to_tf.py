@@ -2,14 +2,18 @@
 Helper functions to assist in conversion of pytorch models into TensorBreeze
 models
 """
+
 from __future__ import absolute_import
 
 from collections import OrderedDict
+import torch
 import tensorflow as tf
+from six.moves import cPickle as pickle
 
 TORCH_DELIMITER = '.'
 TF_DELIMITER = '/'
 TF_POSTFIX = ':0'
+PKL_PROTOCOL = 2
 
 ext_map = {
     'weight': 'kernel',
@@ -102,3 +106,13 @@ def convert_state_dict(torch_state_dict, scoped=True):
         tf_state_dict[tf_name] = tf_value
 
     return tf_state_dict
+
+
+def convert_state_dict_file(torch_file, save_file, scoped=True):
+    """
+    Reads a torch state dict from file and saves it as a TensorBreeze
+    `state dict`
+    """
+    state_dict = torch.load(torch_file)
+    convert_state_dict(state_dict, scoped=scoped)
+    from

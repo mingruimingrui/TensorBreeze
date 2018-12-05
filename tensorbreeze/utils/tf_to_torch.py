@@ -2,6 +2,7 @@
 Helper functions to assist in conversion of TensorBreeze models into pytorch
 models
 """
+
 from __future__ import absolute_import
 
 from collections import OrderedDict

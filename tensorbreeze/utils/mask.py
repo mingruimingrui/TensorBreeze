@@ -2,6 +2,8 @@
 Helper functions to work with masks
 """
 
+from __future__ import absolute_import
+
 import cv2
 import numpy as np
 from pycocotools import mask as maskUtils

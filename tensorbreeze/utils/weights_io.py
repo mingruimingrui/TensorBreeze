@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import tensorflow as tf
 import logging
 from six.moves import cPickle as pickle

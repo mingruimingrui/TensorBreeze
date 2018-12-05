@@ -2,6 +2,8 @@
 Helper functions for working with tf contexts
 """
 
+from __future__ import absolute_import
+
 import contextlib
 import tensorflow as tf
 
