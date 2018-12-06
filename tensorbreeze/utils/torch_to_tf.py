@@ -8,12 +8,11 @@ from __future__ import absolute_import
 from collections import OrderedDict
 import torch
 import tensorflow as tf
-from six.moves import cPickle as pickle
+from .weights_io import save_state_dict_to_file
 
 TORCH_DELIMITER = '.'
 TF_DELIMITER = '/'
 TF_POSTFIX = ':0'
-PKL_PROTOCOL = 2
 
 ext_map = {
     'weight': 'kernel',
@@ -113,6 +112,6 @@ def convert_state_dict_file(torch_file, save_file, scoped=True):
     Reads a torch state dict from file and saves it as a TensorBreeze
     `state dict`
     """
-    state_dict = torch.load(torch_file)
-    convert_state_dict(state_dict, scoped=scoped)
-    from
+    torch_state_dict = torch.load(torch_file)
+    tf_state_dict = convert_state_dict(torch_state_dict, scoped=scoped)
+    save_state_dict_to_file(tf_state_dict, save_file)

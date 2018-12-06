@@ -7,6 +7,7 @@ from __future__ import absolute_import
 
 from collections import OrderedDict
 import torch
+from .weights_io import load_state_dict_from_file
 
 TORCH_DELIMITER = '.'
 TF_DELIMITER = '/'
@@ -96,3 +97,13 @@ def convert_state_dict(tf_state_dict):
         torch_state_dict[torch_name] = torch_value
 
     return torch_state_dict
+
+
+def convert_state_dict_file(tf_file, save_file):
+    """
+    Reads a tf `state dict` from file and savs it as a TensorBreeze
+    state dict
+    """
+    tf_state_dict = load_state_dict_from_file(tf_file)
+    torch_state_dict = convert_state_dict(tf_state_dict)
+    torch.save(torch_state_dict, save_file)
