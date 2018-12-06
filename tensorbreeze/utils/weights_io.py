@@ -38,12 +38,14 @@ def load_weights_from_state_dict(state_dict, sess=None):
     existing_variables = {v.name: v for v in existing_variables}
 
     # Assign appropriate weights to tensors
+    assign_ops = []
     none_loaded = True
     for name, value in state_dict.items():
         if name in existing_variables:
             none_loaded = False
             assign_op = existing_variables[name].assign(value)
-            sess.run(assign_op)
+            assign_ops.append(assign_op)
+    sess.run(assign_ops)
 
     if none_loaded:
         msg = 'No weights were loaded, check if the variables has been created'
