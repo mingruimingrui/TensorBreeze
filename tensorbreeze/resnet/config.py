@@ -83,13 +83,13 @@ def validate_config(config):
 
     if not config.NO_TOP:
         assert config.LAST_CONV == 5, \
-            'In this version of CaffeBrewer, if fully connected layers are used, LAST_CONV must be 5'
+            'In this version of TensorBreeze, if fully connected layers are used, LAST_CONV must be 5'
 
     assert config.FREEZE_BN, \
-        'In this version of CaffeBrewer, batch norm layers must be frozen'
+        'In this version of TensorBreeze, batch norm layers must be frozen'
 
     assert not config.USE_GN, \
-        'In this version of CaffeBrewer, group norma has not been implemented'
+        'In this version of TensorBreeze, group norm has not been implemented'
 
 
 def make_config(config_file=None, **kwargs):
