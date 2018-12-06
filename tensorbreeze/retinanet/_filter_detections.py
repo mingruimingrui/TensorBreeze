@@ -80,54 +80,55 @@ def filter_detections(
         reg_output = reg_output_batch[i]
         bbox_output = bbox_output_batch[i]
 
-        detections = {
-            'boxes': [],
-            'scores': [],
-            'labels': []
-        }
-
         if use_bg_predictor:
             inds_keep = tf.less(cls_output[:, -1], bg_thresh)
             cls_output = tf.boolean_mask(cls_output[:, :-1], inds_keep)
             reg_output = tf.boolean_mask(reg_output, inds_keep)
 
-        if class_specific_nms:
-            for c in range(num_classes):
+        with tf.device('/cpu:0'):
+            detections = {
+                'boxes': [],
+                'scores': [],
+                'labels': []
+            }
+
+            if class_specific_nms:
+                for c in range(num_classes):
+                    filtered_output = add_nms_ops(
+                        boxes=bbox_output,
+                        scores=cls_output[..., c],
+                        labels=c,
+                        apply_nms=apply_nms,
+                        pre_nms_top_n=pre_nms_top_n,
+                        post_nms_top_n=post_nms_top_n,
+                        nms_thresh=nms_thresh,
+                        score_thresh=score_thresh,
+                    )
+                    detections['boxes'].append(filtered_output[0])
+                    detections['scores'].append(filtered_output[1])
+                    detections['labels'].append(filtered_output[2])
+
+                detections['boxes'] = tf.concat(detections['boxes'], axis=0)
+                detections['scores'] = tf.concat(detections['scores'], axis=0)
+                detections['labels'] = tf.concat(detections['labels'], axis=0)
+
+            else:
+                scores = tf.reduce_max(cls_output, axis=-1)
+                labels = tf.argmax(cls_output, axis=-1)
                 filtered_output = add_nms_ops(
                     boxes=bbox_output,
-                    scores=cls_output[..., c],
-                    labels=c,
+                    scores=scores,
+                    labels=labels,
                     apply_nms=apply_nms,
                     pre_nms_top_n=pre_nms_top_n,
                     post_nms_top_n=post_nms_top_n,
                     nms_thresh=nms_thresh,
                     score_thresh=score_thresh,
                 )
-                detections['boxes'].append(filtered_output[0])
-                detections['scores'].append(filtered_output[1])
-                detections['labels'].append(filtered_output[2])
+                detections['boxes'] = filtered_output[0]
+                detections['scores'] = filtered_output[1]
+                detections['labels'] = filtered_output[2]
 
-            detections['boxes'] = tf.concat(detections['boxes'], axis=0)
-            detections['scores'] = tf.concat(detections['scores'], axis=0)
-            detections['labels'] = tf.concat(detections['labels'], axis=0)
-
-        else:
-            scores = tf.reduce_max(cls_output, axis=-1)
-            labels = tf.argmax(cls_output, axis=-1)
-            filtered_output = add_nms_ops(
-                boxes=bbox_output,
-                scores=scores,
-                labels=labels,
-                apply_nms=apply_nms,
-                pre_nms_top_n=pre_nms_top_n,
-                post_nms_top_n=post_nms_top_n,
-                nms_thresh=nms_thresh,
-                score_thresh=score_thresh,
-            )
-            detections['boxes'] = filtered_output[0]
-            detections['scores'] = filtered_output[1]
-            detections['labels'] = filtered_output[2]
-
-        all_detections.append(detections)
+            all_detections.append(detections)
 
     return all_detections
