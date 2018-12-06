@@ -99,7 +99,11 @@ def enqueue_thread_main(
     for batch in data_loader:
         feed_dict = dict(zip(annotation_placeholders, batch['annotations']))
         feed_dict[image_placeholder] = batch['image']
-        sess.run([enqueue_op, enqueue_shape_op], feed_dict=feed_dict)
+        try:
+            sess.run([enqueue_op, enqueue_shape_op], feed_dict=feed_dict)
+        except tf.errors.CancelledError:
+            # Quit upon closing of session
+            break
 
 
 def add_coco_loader_ops(
