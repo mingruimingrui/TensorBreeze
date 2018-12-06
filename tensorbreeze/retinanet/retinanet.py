@@ -126,6 +126,10 @@ def add_retinanet_eval_ops(x, batch_size, config_file=None, **kwargs):
 
     assert isinstance(batch_size, int)
 
+    # Random note, this line of code is really out of place, there is plans to
+    # add the option of choosing between sigmoid and softmax in the future
+    cls_output = tf.sigmoid(cls_output)
+
     detections = filter_detections(
         anchors,
         cls_output,
