@@ -1,0 +1,8 @@
+---
+FPN:
+  MIN_LEVEL: 3
+  MAX_LEVEL: 7
+TARGET:
+  NUM_CLASSES: 80
+COMBINED:
+  USE: true
