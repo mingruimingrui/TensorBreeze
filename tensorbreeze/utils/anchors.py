@@ -221,14 +221,16 @@ def anchor_targets_bbox(
     negative_target = tf.concat([negative_target, negative_bbox_cls_target], 1)
     ignore_target = tf.concat([ignore_target, negative_bbox_cls_target], 1)
 
+    positive_inds = tf.greater_equal(max_overlaps, positive_overlap)
     targets = tf.where(
-        max_overlaps >= positive_overlap,
+        positive_inds,
         anchor_states_bbox_cls_target,
         ignore_target
     )
 
+    negative_inds = tf.less_equal(max_overlaps, negative_overlap)
     targets = tf.where(
-        max_overlaps <= negative_overlap,
+        negative_inds,
         negative_target,
         targets
     )
@@ -251,6 +253,11 @@ def anchor_targets_bbox(
         off_value=0.0,
         dtype=dtype,
         name='cls_target'
+    )
+    cls_target = tf.where(
+        positive_inds,
+        cls_target,
+        tf.zeros_like(cls_target)
     )
 
     return cls_target, bbox_target, anchor_states
