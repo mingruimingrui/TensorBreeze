@@ -3,6 +3,8 @@ from __future__ import absolute_import
 import torch
 import torchvision
 import tensorflow
+
+import torch.utils.collect_env
 from tensorflow.python.framework import test_util as tf_test_util
 
 
