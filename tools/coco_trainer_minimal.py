@@ -29,6 +29,16 @@ num_iter = 100
 
 with Session(allow_growth=True) as sess:
     with tf.device('/cpu:0'):
+        """
+        This will start the multiprocessing and threaded queue loader which is
+        powered by the torch library
+
+        Running batch will fetch a new batch of data
+
+        tf.data is a thing, but is rather memory inefficient and faces massive
+        problems in multiprocessing. It also cannot be shared across other
+        deep learning frameworks
+        """
         batch = add_coco_loader_ops(
             sess=sess,
             root_image_dirs=root_image_dirs,
