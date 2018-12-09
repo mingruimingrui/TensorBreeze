@@ -42,6 +42,7 @@ def load_weights_from_state_dict(state_dict, sess=None):
     none_loaded = True
     for name, value in state_dict.items():
         if name in existing_variables:
+            assert existing_variables[name].shape.as_list() == list(value.shape)
             none_loaded = False
             assign_op = existing_variables[name].assign(value)
             assign_ops.append(assign_op)
