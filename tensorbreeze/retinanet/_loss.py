@@ -86,7 +86,7 @@ def add_loss_ops(
                     preds=bg_output,
                     alpha=focal_alpha,
                     gamma=focal_gamma,
-                    reduction=tf.losses.Reduction.NONE
+                    reduction=tf.losses.Reduction.SUM
                 ) / num_pos_anchors
                 bg_loss = tf.identity(bg_loss, 'value')
 
@@ -99,7 +99,7 @@ def add_loss_ops(
                     preds=cls_output,
                     alpha=focal_alpha,
                     gamma=focal_gamma,
-                    reduction=tf.losses.Reduction.NONE
+                    reduction=tf.losses.Reduction.SUM
                 ) / num_pos_anchors
                 cls_loss = tf.identity(cls_loss, 'value')
 
