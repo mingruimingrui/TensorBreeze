@@ -18,7 +18,6 @@ import logging
 import argparse
 from collections import Mapping
 
-import torch
 import tensorflow as tf
 
 from tensorbreeze.data.data_loaders import add_coco_loader_ops
