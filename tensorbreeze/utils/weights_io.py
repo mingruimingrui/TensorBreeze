@@ -18,9 +18,8 @@ def save_weights_to_state_dict(variables=None, sess=None, scope=None):
         variables = tf.global_variables(scope=scope)
 
     # Retrieve weights from session as numpy arrays
-    state_dict = dict()
-    for v in variables:
-        state_dict[v.name] = sess.run(v)
+    state_dict = {v.name: v for v in variables}
+    state_dict = sess.run(state_dict)
 
     return state_dict
 
