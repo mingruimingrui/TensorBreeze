@@ -107,7 +107,7 @@ venv.bak/
 *.sublime-*
 
 # Depreciated code
-dep/
+dep/**
 
 # Test data
 test/data/**
