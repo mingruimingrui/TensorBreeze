@@ -12,21 +12,6 @@ from .. import transforms
 logger = logging.getLogger(__name__)
 
 
-class CocoGenerator(object):
-    def __init__(self, data_loader):
-        self.data_loader = data_loader
-
-    def __iter__(self):
-        for batch in self.data_loader:
-            yield {
-                'image': batch['image'],
-                'annotations': tuple(batch['annotations'])
-            }
-
-    def __call__(self):
-        return self
-
-
 def make_coco_data_loader(
     root_image_dirs,
     ann_files,
@@ -196,56 +181,3 @@ def add_coco_loader_ops(
         'image': image_tensor,
         'annotations': annotations_tensor
     }
-
-
-def add_coco_loader_ops_experimental(
-    sess,
-    root_image_dirs,
-    ann_files,
-    num_iter=None,
-    batch_size=1,
-    num_workers=2,
-    drop_no_anns=True,
-    mask=False,
-    min_size=800,
-    max_size=1333,
-    random_horizontal_flip=False,
-    random_vertical_flip=False
-):
-    """
-    Coco data loader implemented with tf.data
-    TODO: Adapt entire tensorbreeze.data to use tf.data and tf.transforms ops
-    """
-    logger.warning('add_coco_loader_ops_experimental is still incomplete, efficiency is poor')
-    data_loader = make_coco_data_loader(
-        root_image_dirs=root_image_dirs,
-        ann_files=ann_files,
-        num_iter=num_iter,
-        batch_size=batch_size,
-        num_workers=0,
-        drop_no_anns=drop_no_anns,
-        mask=mask,
-        min_size=min_size,
-        max_size=max_size,
-        random_horizontal_flip=random_horizontal_flip,
-        random_vertical_flip=random_vertical_flip
-    )
-
-    coco_generator = CocoGenerator(data_loader)
-    output_types = {
-        'image': tf.float32,
-        'annotations': (tf.float32,) * batch_size
-    }
-    output_shapes = {
-        'image': (batch_size, 3, None, None),
-        'annotations': ((None, 5),) * batch_size
-    }
-
-    tf_dataset = tf.data.Dataset.from_generator(
-        coco_generator,
-        output_types=output_types,
-        output_shapes=output_shapes
-    )
-
-    tf_iterator = tf_dataset.make_one_shot_iterator()
-    return tf_iterator.get_next()
