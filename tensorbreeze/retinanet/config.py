@@ -28,7 +28,7 @@ _C.BACKBONE.immutable(False)
 # FPN options
 # --------------------------------------------------------------------------- #
 _C.FPN = fpn_config.clone()
-_C.BACKBONE.immutable(False)
+_C.FPN.immutable(False)
 # Refer to kindler.fpn.config for full list of configs
 # You can safely ignore BACKBONE_CHANNEL_SIZES, MIN_INPUT_LEVEL and
 # MAX_INPUT_LEVEL as these are values that will be inferred from your backbone
