@@ -138,7 +138,6 @@ def add_input_fn(sess, args):
                 sess=sess,
                 root_image_dirs=args.root_image_dirs,
                 ann_files=args.ann_files,
-                num_iter=args.max_iter,
                 batch_size=args.batch_size,
                 num_workers=args.batch_size * 4,
                 min_size=args.min_image_size,

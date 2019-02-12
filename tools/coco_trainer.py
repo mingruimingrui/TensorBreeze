@@ -25,7 +25,6 @@ from tensorbreeze.retinanet import add_retinanet_train_ops
 from tensorbreeze.retinanet import load_pretrained_weights
 from tensorbreeze.layers import add_meter_dict_ops
 from tensorbreeze.utils.context import Session
-from tensorbreeze.utils.weights_io import load_weights_from_file
 from tensorbreeze.utils.weights_io import save_weights_to_file
 from tensorbreeze.utils.logging import setup_logging
 from tensorbreeze.utils.collect_env import get_pretty_env_info
@@ -140,7 +139,6 @@ def add_input_fn(sess, args):
                 sess=sess,
                 root_image_dirs=args.root_image_dirs,
                 ann_files=args.ann_files,
-                num_iter=args.max_iter,
                 batch_size=args.batch_size,
                 num_workers=args.batch_size * 2,
                 drop_no_anns=True,
@@ -175,8 +173,7 @@ def add_backprop_fn(sess, loss_dict, args):
 def init_variables(sess, retinanet_config, args):
     logger.info('Initializing weights')
     sess.run(tf.global_variables_initializer())
-    load_weights_from_file('init_weights.pkl')
-    # load_pretrained_weights(retinanet_config.BACKBONE.TYPE, sess, verbosity=1)
+    load_pretrained_weights(retinanet_config.BACKBONE.TYPE, sess, verbosity=1)
 
 
 def setup_tensorboard(sess, loss_dict, args):

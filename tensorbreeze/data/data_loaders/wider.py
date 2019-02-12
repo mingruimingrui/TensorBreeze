@@ -119,7 +119,6 @@ def add_wider_loader_ops(
     sess,
     root_image_dirs,
     ann_files,
-    num_iter=None,
     batch_size=1,
     num_workers=2,
     min_size=1024,

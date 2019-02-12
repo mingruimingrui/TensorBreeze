@@ -1,3 +1,4 @@
+import sys
 import logging
 import threading
 
@@ -96,7 +97,6 @@ def add_coco_loader_ops(
     sess,
     root_image_dirs,
     ann_files,
-    num_iter=None,
     batch_size=1,
     num_workers=2,
     drop_no_anns=True,
@@ -113,7 +113,7 @@ def add_coco_loader_ops(
     data_loader = make_coco_data_loader(
         root_image_dirs=root_image_dirs,
         ann_files=ann_files,
-        num_iter=num_iter,
+        num_iter=sys.maxsize,
         batch_size=batch_size,
         num_workers=num_workers,
         drop_no_anns=drop_no_anns,
