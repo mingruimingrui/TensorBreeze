@@ -22,6 +22,8 @@ import tensorflow as tf
 
 from tensorbreeze.data.data_loaders import add_coco_loader_ops
 from tensorbreeze.retinanet import add_retinanet_train_ops
+from tensorbreeze.retinanet import load_pretrained_weights
+from tensorbreeze.layers import add_meter_dict_ops
 from tensorbreeze.utils.context import Session
 from tensorbreeze.utils.weights_io import load_weights_from_file
 from tensorbreeze.utils.weights_io import save_weights_to_file
@@ -64,7 +66,8 @@ def parse_args(args):
         help='Path to annotation files multiple files can be accepted')
     parser.add_argument(
         '--root-image-dirs', type=str, nargs='+',
-        help='Path to image directories, should have same entries as ann files')
+        help='Path to image directories, '
+        'should have same entries as ann files')
 
     parser.add_argument(
         '--batch-size', type=int, default=1,
@@ -73,8 +76,9 @@ def parse_args(args):
         '--max-iter', type=int, default=1440000,
         help='Maximum number of iterations to perform during training')
     parser.add_argument(
-        '--base-lr', type=float, default=0.001,
-        help='Learning rate to use during training will be adjusted by rank and num gpus')
+        '--base-lr', type=float, default=0.00001,
+        help='Learning rate to use during training, '
+        'will be adjusted by batch size, rank and num gpus')
     parser.add_argument(
         '--warmup-iters', type=int, default=8000,
         help='Number of iterations for SGD warm up')
@@ -168,10 +172,11 @@ def add_backprop_fn(sess, loss_dict, args):
     return backprop_op
 
 
-def init_variables(sess, args):
+def init_variables(sess, retinanet_config, args):
     logger.info('Initializing weights')
     sess.run(tf.global_variables_initializer())
     load_weights_from_file('init_weights.pkl')
+    # load_pretrained_weights(retinanet_config.BACKBONE.TYPE, sess, verbosity=1)
 
 
 def setup_tensorboard(sess, loss_dict, args):
@@ -247,6 +252,7 @@ def do_train(
     start_training_time = time.time()
     checkpoint_period = 20000 // args.batch_size
     logging_period = 250
+    loss_dict_ops = {k: v.op for k, v in loss_dict.items()}
 
     t0 = time.time()
     for iter in tqdm(range(1, args.max_iter + 1)):
@@ -254,7 +260,7 @@ def do_train(
         t0 = time.time()
 
         if iter % logging_period != 0:
-            sess.run(backprop_op)
+            sess.run([backprop_op, loss_dict_ops])
 
         else:
             epoch_summaries_buffer, losses, _ = \
@@ -292,11 +298,15 @@ def main_(sess, args):
     batch = add_input_fn(sess, args)
     loss_dict, retinanet_config = add_loss_fn(batch, args)
     backprop_op = add_backprop_fn(sess, loss_dict, args)
+    init_variables(sess, retinanet_config, args)
+    meter_dict, _ = add_meter_dict_ops(
+        loss_dict,
+        init_values=sess.run(loss_dict)
+    )
 
     # Prepare and perform training
-    init_variables(sess, args)
-    summary_writer = setup_tensorboard(sess, loss_dict, args)
-    epoch_summaries = add_epoch_summary_ops(sess, loss_dict, args)
+    summary_writer = setup_tensorboard(sess, meter_dict, args)
+    epoch_summaries = add_epoch_summary_ops(sess, meter_dict, args)
     log_configs(sess, summary_writer, retinanet_config, args)
 
     do_train(
@@ -304,7 +314,7 @@ def main_(sess, args):
         summary_writer,
         epoch_summaries,
         batch,
-        loss_dict,
+        meter_dict,
         backprop_op,
         args
     )
