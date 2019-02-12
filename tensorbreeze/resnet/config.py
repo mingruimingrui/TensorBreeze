@@ -85,8 +85,8 @@ def validate_config(config):
         assert config.LAST_CONV == 5, \
             'In this version of TensorBreeze, if fully connected layers are used, LAST_CONV must be 5'
 
-    assert config.FREEZE_BN, \
-        'In this version of TensorBreeze, batch norm layers must be frozen'
+    # assert config.FREEZE_BN, \
+    #     'In this version of TensorBreeze, batch norm layers must be frozen'
 
     assert not config.USE_GN, \
         'In this version of TensorBreeze, group norm has not been implemented'

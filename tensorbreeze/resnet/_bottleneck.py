@@ -9,7 +9,8 @@ def add_bottleneck_ops_1(
     stride=1,
     data_format='channels_first',
     trainable=True,
-    downsample=False
+    downsample=False,
+    freeze_bn=True,
 ):
     """
     Default bottleneck layer for resnet18 and resnet34
@@ -35,7 +36,7 @@ def add_bottleneck_ops_1(
                 axis=channel_axis,
                 momentum=0.1,
                 epsilon=1e-5,
-                trainable=False,
+                trainable=trainable and not freeze_bn,
                 name='1'
             )
 
@@ -57,7 +58,7 @@ def add_bottleneck_ops_1(
         axis=channel_axis,
         momentum=0.1,
         epsilon=1e-5,
-        trainable=False,
+        trainable=trainable and not freeze_bn,
         name='bn1'
     )
     x_a = tf.nn.relu(x_a)
@@ -80,7 +81,7 @@ def add_bottleneck_ops_1(
         axis=channel_axis,
         momentum=0.1,
         epsilon=1e-5,
-        trainable=False,
+        trainable=trainable and not freeze_bn,
         name='bn2'
     )
 
@@ -96,7 +97,8 @@ def add_bottleneck_ops_2(
     stride=1,
     data_format='channels_first',
     trainable=True,
-    downsample=False
+    downsample=False,
+    freeze_bn=True
 ):
     """
     Default bottleneck layer for resnet50, resnet101, resnet152
@@ -122,7 +124,7 @@ def add_bottleneck_ops_2(
                 axis=channel_axis,
                 momentum=0.1,
                 epsilon=1e-5,
-                trainable=False,
+                trainable=trainable and not freeze_bn,
                 name='1'
             )
 
@@ -143,7 +145,7 @@ def add_bottleneck_ops_2(
         axis=channel_axis,
         momentum=0.1,
         epsilon=1e-5,
-        trainable=False,
+        trainable=trainable and not freeze_bn,
         name='bn1'
     )
     x_a = tf.nn.relu(x_a)
@@ -166,7 +168,7 @@ def add_bottleneck_ops_2(
         axis=channel_axis,
         momentum=0.1,
         epsilon=1e-5,
-        trainable=False,
+        trainable=trainable and not freeze_bn,
         name='bn2'
     )
     x_b = tf.nn.relu(x_b)
@@ -188,7 +190,7 @@ def add_bottleneck_ops_2(
         axis=channel_axis,
         momentum=0.1,
         epsilon=1e-5,
-        trainable=False,
+        trainable=trainable and not freeze_bn,
         name='bn3'
     )
 

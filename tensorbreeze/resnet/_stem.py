@@ -2,7 +2,7 @@ import tensorflow as tf
 from .. import layers
 
 
-def add_stem_ops(x, dim, data_format='channels_first', trainable=True):
+def add_stem_ops(x, dim, data_format='channels_first', trainable=True, freeze_bn=True):
     norm_axis = 1 if data_format == 'channels_first' else -1
 
     x = layers.pad2d(x, 3)
@@ -22,7 +22,7 @@ def add_stem_ops(x, dim, data_format='channels_first', trainable=True):
         axis=norm_axis,
         momentum=0.1,
         epsilon=1e-5,
-        trainable=False,
+        trainable=trainable and not freeze_bn,
         name='bn1'
     )
     return tf.nn.relu(x)

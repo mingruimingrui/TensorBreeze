@@ -9,7 +9,8 @@ def add_layer_ops(
     num_blocks,
     stride=1,
     data_format='channels_first',
-    trainable=True
+    trainable=True,
+    freeze_bn=True
 ):
     """
     Dynamic resnet layer builder that builds bottleneck layers
@@ -32,7 +33,8 @@ def add_layer_ops(
                 stride=stride if is_first_block else 1,
                 data_format=data_format,
                 trainable=trainable,
-                downsample=is_first_block and dim_in != dim_out
+                downsample=is_first_block and dim_in != dim_out,
+                freeze_bn=freeze_bn
             )
 
     return x
