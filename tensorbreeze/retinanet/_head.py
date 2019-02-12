@@ -1,3 +1,5 @@
+import math
+import numpy as np
 import tensorflow as tf
 from .. import layers
 
@@ -32,6 +34,8 @@ def comb_head(
         bg_split_point = num_anchors * num_classes
         split_point = num_anchors * total_num_classes
 
+    output_size = num_anchors * (total_num_classes + total_num_bbox)
+
     # Apply conv layers
     for i in range(num_layers):
         x = layers.pad2d(x, 1)
@@ -49,6 +53,21 @@ def comb_head(
         )
         x = tf.nn.relu(x)
 
+    # Add outputs
+    def bias_initializer(*args, **kwargs):
+        shape = (output_size,)
+        # value = np.zeros(shape).astype('float32')
+        value = np.random.normal(0, 0.01, shape).astype('float32')
+        if use_bg_predictor:
+            value[:bg_split_point] = \
+                - math.log((1 - prior_prob) / prior_prob)
+            value[bg_split_point:split_point] = \
+                - math.log(prior_prob / (1 - prior_prob))
+        else:
+            value[:split_point] = \
+                - math.log((1 - prior_prob) / prior_prob)
+        return value
+
     x = layers.pad2d(x, 1)
     x = tf.layers.conv2d(
         x,
@@ -60,7 +79,9 @@ def comb_head(
         use_bias=True,
         trainable=True,
         name='head/{}'.format(num_layers * 2),
-        reuse=reuse
+        reuse=reuse,
+        kernel_initializer=tf.random_normal_initializer(stddev=0.01),
+        bias_initializer=bias_initializer
     )
 
     # Perform some surgery to extract the classification and regression
@@ -151,6 +172,8 @@ def cls_head(
     if use_bg_predictor:
         bg_split_point = num_anchors * num_classes
 
+    output_size = num_anchors * (total_num_classes)
+
     # Apply conv layers
     for i in range(num_layers):
         x = layers.pad2d(x, 1)
@@ -168,10 +191,24 @@ def cls_head(
         )
         x = tf.nn.relu(x)
 
+    # Add outputs
+    def bias_initializer(*args, **kwargs):
+        shape = (output_size,)
+        # value = np.zeros(shape).astype('float32')
+        value = np.random.normal(0, 0.01, shape).astype('float32')
+        if use_bg_predictor:
+            value[:bg_split_point] = \
+                - math.log((1 - prior_prob) / prior_prob)
+            value[bg_split_point:] = \
+                - math.log(prior_prob / (1 - prior_prob))
+        else:
+            value.fill(- math.log((1 - prior_prob) / prior_prob))
+        return value
+
     x = layers.pad2d(x, 1)
     x = tf.layers.conv2d(
         x,
-        num_anchors * (total_num_classes),
+        output_size,
         kernel_size=3,
         strides=1,
         padding='valid',
@@ -179,7 +216,9 @@ def cls_head(
         use_bias=True,
         trainable=True,
         name='head/{}'.format(num_layers * 2),
-        reuse=reuse
+        reuse=reuse,
+        kernel_initializer=tf.random_normal_initializer(stddev=0.01),
+        bias_initializer=bias_initializer
     )
 
     # Perform some surgery to extract the classification outputs
