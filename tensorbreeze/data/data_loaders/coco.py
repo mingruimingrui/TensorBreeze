@@ -82,12 +82,27 @@ def enqueue_thread_main(
     image_placeholder,
     annotation_placeholders,
 ):
+    data_iter = iter(data_loader)
+
     while True:
+        # Get next batch
         try:
-            for batch in data_loader:
-                feed_dict = dict(zip(annotation_placeholders, batch['annotations']))
-                feed_dict[image_placeholder] = batch['image']
-                sess.run([enqueue_op, enqueue_shape_op], feed_dict=feed_dict)
+            batch = next(data_iter)
+        except StopIteration:
+            data_iter = iter(data_loader)
+            batch = next(data_iter)
+
+        # Ensure that all images have annotations
+        if not all([len(ann) > 0 for ann in batch['annotations']]):
+            continue
+
+        # Create feed dict
+        feed_dict = dict(zip(annotation_placeholders, batch['annotations']))
+        feed_dict[image_placeholder] = batch['image']
+
+        # Enqueue
+        try:
+            sess.run([enqueue_op, enqueue_shape_op], feed_dict=feed_dict)
         except tf.errors.CancelledError:
             # Quit upon closing of session
             break
