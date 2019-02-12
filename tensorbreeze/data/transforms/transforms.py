@@ -115,10 +115,10 @@ class ImageResize(object):
         item['width_scale'] = width_scale
 
         if 'annotations' in item:
-            item['annotations'][:, 0] *= width_scale
-            item['annotations'][:, 1] *= height_scale
-            item['annotations'][:, 2] *= width_scale
-            item['annotations'][:, 3] *= height_scale
+            item['annotations'][:, 0] = item['annotations'][:, 0] * width_scale
+            item['annotations'][:, 1] = item['annotations'][:, 1] * height_scale
+            item['annotations'][:, 2] = item['annotations'][:, 2] * width_scale
+            item['annotations'][:, 3] = item['annotations'][:, 3] * height_scale
 
         if 'masks' in item:
             masks = []
@@ -129,6 +129,38 @@ class ImageResize(object):
                 mask = cv2.resize(mask, (mask_width, mask_height))
                 masks.append(mask)
             item['masks'] = np.array(masks)
+
+        return item
+
+
+class RandomCrop(object):
+    """ Random crop transformation """
+    def __init__(self, height, width):
+        """
+        Args:
+            height, width: The size of cropped images
+        """
+        self.height = height
+        self.width = width
+
+    def __call__(self, item):
+        check_image_is_numpy(item['image'])
+
+        image_shape = item['image'].shape
+        y_start = random.randint(0, max(image_shape[0] - self.height, 0))
+        x_start = random.randint(0, max(image_shape[1] - self.width, 0))
+
+        item['image'] = item['image'][y_start:(y_start + self.height), x_start:(x_start + self.width)]
+        item['image'] = item['image'].copy()
+
+        if 'annotations' in item:
+            item['annotations'][:, 0] = item['annotations'][:, 0] - x_start
+            item['annotations'][:, 1] = item['annotations'][:, 1] - y_start
+            item['annotations'][:, 2] = item['annotations'][:, 2] - x_start
+            item['annotations'][:, 3] = item['annotations'][:, 3] - y_start
+
+        if 'masks' in item:
+            item['masks'] = item['masks'][y_start:(y_start + self.height), x_start:(x_start + self.width)]
 
         return item
 
@@ -196,4 +228,28 @@ class ImageNormalization(object):
     def __call__(self, item):
         check_image_is_numpy(item['image'])
         item['image'] = (item['image'] - VGG_MEAN) / VGG_STD
+        return item
+
+
+class RemoveInvalidAnnotations(object):
+    """ Removes invalid annotations """
+    def __init__(self, data_format='channels_last'):
+        assert data_format in ['channels_last', 'channels_first']
+        self.data_format = data_format
+
+    def __call__(self, item):
+        if self.data_format == 'channels_last':
+            img_h, img_w = item['image'].shape[:2]
+        else:
+            img_h, img_w = item['image'].shape[1:3]
+
+        keep = (item['annotations'][:, 0] >= 0) & \
+            (item['annotations'][:, 1] >= 0) & \
+            (item['annotations'][:, 2] <= img_w) & \
+            (item['annotations'][:, 3] <= img_h) & \
+            (item['annotations'][:, 2] > item['annotations'][:, 0]) & \
+            (item['annotations'][:, 3] > item['annotations'][:, 1])
+
+        item['annotations'] = item['annotations'][keep]
+
         return item

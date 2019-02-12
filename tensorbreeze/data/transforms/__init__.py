@@ -1,15 +1,19 @@
 from .transforms import (
     Compose,
     ImageResize,
+    RandomCrop,
     RandomHorizontalFlip,
     RandomVerticalFlip,
-    ImageNormalization
+    ImageNormalization,
+    RemoveInvalidAnnotations
 )
 
 __all__ = [
     'Compose',
     'ImageResize',
+    'RandomCrop',
     'RandomHorizontalFlip',
     'RandomVerticalFlip',
-    'ImageNormalization'
+    'ImageNormalization',
+    'RemoveInvalidAnnotations'
 ]

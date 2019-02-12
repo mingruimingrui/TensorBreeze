@@ -135,6 +135,7 @@ class DetectionDataset(torch.utils.data.Dataset):
         desc = 'Profiling image sizes'
         image_sizes = []
         for f in tqdm.tqdm(self.image_files, desc=desc):
+            f = os.path.join(self.root_dir, f)
             image_sizes.append(get_image_size(f))
         self.image_heights, self.image_widths = zip(*image_sizes)
         self.image_heights = list(self.image_heights)
