@@ -62,6 +62,14 @@ def add_loss_ops(
         pos_anchors = tf.greater(anchor_states, 0.5)
         non_neg_anchors = tf.greater_equal(anchor_states, 0)
         num_pos_anchors = tf.reduce_sum(tf.cast(pos_anchors, cls_output.dtype))
+
+        # loss multiplier
+        # 1 if num_pos_anchors >= 1
+        # 0 if num_pos_anchors == 0
+        mult = tf.minimum(num_pos_anchors, 1)
+
+        # Make num_pos_anchors to take a minimum value to discount
+        # cases where large loss is experienced at low num_pos_anchors
         num_pos_anchors = tf.maximum(num_pos_anchors, 10)
 
         # Compute reg loss
@@ -73,7 +81,7 @@ def add_loss_ops(
                 predictions=reg_output,
                 delta=reg_beta,
                 reduction=tf.losses.Reduction.SUM,
-            ) / num_pos_anchors
+            ) / num_pos_anchors * mult
             reg_loss = tf.identity(reg_loss, name='value')
 
         if use_bg_predictor:
@@ -87,7 +95,7 @@ def add_loss_ops(
                     alpha=focal_alpha,
                     gamma=focal_gamma,
                     reduction=tf.losses.Reduction.SUM
-                ) / num_pos_anchors
+                ) / num_pos_anchors * mult
                 bg_loss = tf.identity(bg_loss, 'value')
 
             with tf.variable_scope('cls_loss/'):
@@ -100,7 +108,7 @@ def add_loss_ops(
                     alpha=focal_alpha,
                     gamma=focal_gamma,
                     reduction=tf.losses.Reduction.SUM
-                ) / num_pos_anchors
+                ) / num_pos_anchors * mult
                 cls_loss = tf.identity(cls_loss, 'value')
 
             # Compute total loss and form dict
@@ -123,7 +131,7 @@ def add_loss_ops(
                     alpha=focal_alpha,
                     gamma=focal_gamma,
                     reduction=tf.losses.Reduction.SUM
-                ) / num_pos_anchors
+                ) / num_pos_anchors * mult
                 cls_loss = tf.identity(cls_loss, 'value')
 
             # Compute total loss and form dict
