@@ -58,6 +58,9 @@ def make_image_folder_data_loader(
             random?
         random_vertical_flip: Should image be flipped vertically at random?
     """
+    # Has to be provided until eval method is exposed
+    assert num_iter is not None, 'num_iter has to be provided'
+
     # Make image transforms
     image_transforms = [torchvision.transforms.Resize(size=(height, width))]
 
@@ -184,7 +187,7 @@ def add_image_folder_loader_ops(
             Will only be used if method is 'balanced'
         img_per_cls: The number of unique images per class in each batch
             Will only be used if method is 'balanced'
-        num_workers: The number of workers used to generate data
+        num_workers: The number of workers used to generate batches
         random_horizontal_flip: Should images be flipped horizontally at
             random?
         random_vertical_flip: Should image be flipped vertically at random?
