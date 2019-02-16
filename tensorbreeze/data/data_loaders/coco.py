@@ -1,6 +1,7 @@
 import sys
 import logging
 import threading
+from six import string_types
 
 import tensorflow as tf
 from torch.utils.data import ConcatDataset, DataLoader
@@ -29,7 +30,33 @@ def make_coco_data_loader(
     """
     Coco data loader implemented with
     multiprocessing data loader and batch queue
+
+    Args:
+        root_image_dirs: A directory storing all coco images
+            (Or a list of directory)
+        ann_files: Path to a coco annotation file
+            (Or a list of paths) (If list, must have same number of entries as
+            root_image_dirs)
+        num_iters: The number of iterations that data_loader can run
+        batch_size: The size of batches produced by data_loader
+        num_workers: The number of workers used to generate batches
+        drop_no_anns: Should images with no annotations be dropped?
+        mask: Should masks be produced as well?
+        min_size: Minimum size of image produced (max_size will be prioritized)
+        max_size: Maximum size of image produced
+        random_horizontal_flip: Should images be flipped horizontally at
+            random?
+        random_vertical_flip: Should image be flipped vertically at random?
     """
+    if isinstance(root_image_dirs, string_types):
+        assert isinstance(ann_files, string_types)
+        root_image_dirs = [root_image_dirs]
+        ann_files = [ann_files]
+
+    # Has to be provided until eval method is exposed
+    assert num_iter is not None, 'num_iter has to be provided'
+
+    # Create image transforms
     image_transforms = []
 
     if random_horizontal_flip:
@@ -43,8 +70,8 @@ def make_coco_data_loader(
         transforms.ImageNormalization()
     ]
     image_transforms = transforms.Compose(image_transforms)
-    image_collate = ImageCollate()
 
+    # Create dataset
     datasets = []
     for root_image_dir, ann_file in zip(root_image_dirs, ann_files):
         datasets.append(CocoDataset(
@@ -53,8 +80,10 @@ def make_coco_data_loader(
             mask=mask,
             transforms=image_transforms
         ))
-
     coco_dataset = ConcatDataset(datasets)
+
+    # Create image collate and batch sampler
+    image_collate = ImageCollate()
     batch_sampler = DetectionSampler(
         dataset=coco_dataset,
         batch_size=batch_size,
@@ -64,6 +93,7 @@ def make_coco_data_loader(
         drop_no_anns=drop_no_anns,
     )
 
+    # Create data_loader
     data_loader = DataLoader(
         coco_dataset,
         collate_fn=image_collate,
@@ -122,8 +152,25 @@ def add_coco_loader_ops(
     random_vertical_flip=False
 ):
     """
-    Coco data laoder implemented with multiprocessing data loader
-    and an enqueue thread
+    Coco data loader implemented with
+    multiprocessing data loader and batch queue
+
+    Args:
+        root_image_dirs: A directory storing all coco images
+            (Or a list of directory)
+        ann_files: Path to a coco annotation file
+            (Or a list of paths) (If list, must have same number of entries as
+            root_image_dirs)
+        num_iters: The number of iterations that data_loader can run
+        batch_size: The size of batches produced by data_loader
+        num_workers: The number of workers used to generate batches
+        drop_no_anns: Should images with no annotations be dropped?
+        mask: Should masks be produced as well?
+        min_size: Minimum size of image produced (max_size will be prioritized)
+        max_size: Maximum size of image produced
+        random_horizontal_flip: Should images be flipped horizontally at
+            random?
+        random_vertical_flip: Should image be flipped vertically at random?
     """
     data_loader = make_coco_data_loader(
         root_image_dirs=root_image_dirs,
@@ -163,9 +210,21 @@ def add_coco_loader_ops(
     )
     image_shape_queue.size()
 
-    # Create enqueue ops
+    # Create enqueue dequeue ops
     enqueue_op = batch_queue.enqueue(input_placeholders)
     enqueue_shape_op = image_shape_queue.enqueue(tf.shape(image_placeholder))
+    input_tensors = batch_queue.dequeue()
+
+    # Create reshape ops
+    image_shape_tensor = image_shape_queue.dequeue()
+    image_tensor = tf.reshape(
+        input_tensors[0],
+        [image_shape_tensor[0], 3, image_shape_tensor[2], image_shape_tensor[3]]
+    )
+    annotations_tensor = [
+        tf.reshape(ann, [-1, 5])
+        for ann in input_tensors[1:]
+    ]
 
     # Start enqueue threads
     t = threading.Thread(target=enqueue_thread_main, kwargs={
@@ -178,19 +237,6 @@ def add_coco_loader_ops(
     })
     t.setDaemon(True)
     t.start()
-
-    # Create dequeue + reshape ops
-    input_tensors = batch_queue.dequeue()
-    image_shape_tensor = image_shape_queue.dequeue()
-
-    image_tensor = tf.reshape(
-        input_tensors[0],
-        [image_shape_tensor[0], 3, image_shape_tensor[2], image_shape_tensor[3]]
-    )
-    annotations_tensor = [
-        tf.reshape(ann, [-1, 5])
-        for ann in input_tensors[1:]
-    ]
 
     # Return batch
     return {
