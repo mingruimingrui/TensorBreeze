@@ -9,7 +9,7 @@ def add_meter_ops(
     init_value=0
 ):
     """ Meter for recording loss """
-    with tf.variable_scope('meter/'):
+    with tf.variable_scope('meter'):
         x = tf.Variable(
             initial_value=init_value,
             trainable=False,
