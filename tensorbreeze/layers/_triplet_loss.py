@@ -4,7 +4,7 @@ import numpy as np
 
 def add_fixed_semi_random_triplet_loss(
     embedding,
-    cls_per_mb,
+    cls_per_batch,
     img_per_cls,
     dist_type='euclidean',
     margin=1.0,
@@ -25,8 +25,8 @@ def add_fixed_semi_random_triplet_loss(
     Args:
         embedding: A 2D embedding tensor of the shape
             (batch_size, embedding_size). Do note that `batch_size` should be
-            cls_per_mb * img_per_cls
-        cls_per_mb: An integer representing the number of unique classes in
+            cls_per_batch * img_per_cls
+        cls_per_batch: An integer representing the number of unique classes in
             `embedding`
         img_per_cls: An integer representing the number of unique images for
             each class in `embedding`
@@ -55,7 +55,7 @@ def add_fixed_semi_random_triplet_loss(
         # Ensure that variables are valid
         mb_size = embedding.shape[0]
         assert len(embedding.shape) == 2
-        assert mb_size == cls_per_mb * img_per_cls
+        assert mb_size == cls_per_batch * img_per_cls
         assert dist_type in {'cosine', 'euclidean'}
 
         # Constraint k1 and k2
@@ -88,7 +88,7 @@ def add_fixed_semi_random_triplet_loss(
         all_pos_dist = []
         all_neg_dist = []
 
-        for i in range(cls_per_mb):
+        for i in range(cls_per_batch):
             # Gather pos and neg dists for each sample of class
             pos_ids_start = i * img_per_cls
             pos_ids_end = (i + 1) * img_per_cls
