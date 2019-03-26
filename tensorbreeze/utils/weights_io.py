@@ -1,10 +1,8 @@
 from __future__ import absolute_import
 
+import warnings
 import tensorflow as tf
-import logging
 from six.moves import cPickle as pickle
-
-logger = logging.getLogger(__name__)
 
 PKL_PROTOCOL = 2
 
@@ -49,7 +47,7 @@ def load_weights_from_state_dict(state_dict, sess=None):
 
     if none_loaded:
         msg = 'No weights were loaded, check if the variables has been created'
-        logger.warning(msg)
+        warnings.warn(msg)
 
 
 def save_state_dict_to_file(state_dict, filename):

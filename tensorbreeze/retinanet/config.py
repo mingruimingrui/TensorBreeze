@@ -1,7 +1,6 @@
 """
 Retinanet config system
 """
-import logging
 from ..utils.config_system import ConfigSystem
 
 from ..resnet.config import config as backbone_config
@@ -10,8 +9,6 @@ from ..resnet.config import resnet_type_to_channel_sizes as backbone_type_to_cha
 
 from ..fpn.config import config as fpn_config
 from ..fpn.config import validate_config as validate_fpn_config
-
-logger = logging.getLogger(__name__)
 
 _C = ConfigSystem()
 config = _C

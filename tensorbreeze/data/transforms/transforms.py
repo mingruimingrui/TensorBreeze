@@ -5,13 +5,11 @@ kindler.data.datasets
 from __future__ import absolute_import
 from __future__ import division
 
+import warnings
 import random
-import logging
 
 import cv2
 import numpy as np
-
-logger = logging.getLogger(__name__)
 
 VGG_MEAN = [123.675, 116.28, 103.53]
 VGG_STD = [58.395, 57.12, 57.375]
@@ -68,7 +66,7 @@ class ImageResize(object):
             assert width is not None, \
                 'If height is provided, then width must be provided as well'
             if min_size is not None or max_size is not None:
-                logger.warn('height and width are already provided, min_size and max_size will be ignored')
+                warnings.warn('height and width are already provided, min_size and max_size will be ignored')
 
             self.height = height
             self.width = width

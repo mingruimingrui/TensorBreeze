@@ -7,11 +7,9 @@ from __future__ import unicode_literals
 
 import json
 import yaml
-import logging
+import warnings
 from copy import deepcopy
 from .collections import AttrDict
-
-logger = logging.getLogger(__name__)
 
 
 class ConfigSystem(AttrDict):
@@ -30,7 +28,7 @@ class ConfigSystem(AttrDict):
         self.immutable(False)
         for key, value in new_config.items():
             if not hasattr(self, key):
-                logger.warn('"{}" is not a valid key, skipping'.format(key))
+                warnings.warn('"{}" is not a valid key, skipping'.format(key))
                 continue
             if isinstance(value, dict):
                 self[key].update(value)

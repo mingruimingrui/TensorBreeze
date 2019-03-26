@@ -1,5 +1,4 @@
 import sys
-import logging
 import threading
 from six import string_types
 
@@ -10,8 +9,6 @@ from ..datasets import CocoDataset
 from ..samplers import DetectionSampler
 from ..collate import ImageCollate
 from .. import transforms
-
-logger = logging.getLogger(__name__)
 
 
 def make_coco_data_loader(

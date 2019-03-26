@@ -1,13 +1,10 @@
 """
 ImageEncoder config system
 """
-import logging
 from ..utils.config_system import ConfigSystem
 
 from ..resnet.config import config as backbone_config
 from ..resnet.config import validate_config as validate_backbone_config
-
-logger = logging.getLogger(__name__)
 
 _C = ConfigSystem()
 config = _C

@@ -1,10 +1,7 @@
 """
 FPN config system
 """
-import logging
 from ..utils.config_system import ConfigSystem
-
-logger = logging.getLogger(__name__)
 
 _C = ConfigSystem()
 config = _C
@@ -60,7 +57,7 @@ def validate_config(config):
     implied_max_input_level = config.MIN_INPUT_LEVEL + len(config.BACKBONE_CHANNEL_SIZES) - 1
     if not config.MAX_INPUT_LEVEL == implied_max_input_level:
         config.update({'MAX_INPUT_LEVEL': implied_max_input_level})
-        logger.info('MAX_INPUT_LEVEL automatically set to {}'.format(implied_max_input_level))
+        print('MAX_INPUT_LEVEL automatically set to {}'.format(implied_max_input_level))
 
 
 def make_config(config_file=None, **kwargs):

@@ -1,13 +1,9 @@
-import logging
-
 import torchvision
 import tensorflow as tf
 
 from .config import valid_resnet_types
 from ..utils.torch_to_tf import convert_state_dict
 from ..utils.weights_io import load_weights_from_state_dict
-
-logger = logging.getLogger(__name__)
 
 
 def load_pretrained_weights(resnet_type, sess=None, verbosity=0):
@@ -32,7 +28,7 @@ def load_pretrained_weights(resnet_type, sess=None, verbosity=0):
         sess = tf.get_default_session()
 
     if verbosity >= 1:
-        logger.info('Loading pretrained weights for {}'.format(resnet_type))
+        print('Loading pretrained weights for {}'.format(resnet_type))
 
     # Load a torch model and extract its state_dict
     torch_model_fn = getattr(torchvision.models, resnet_type)

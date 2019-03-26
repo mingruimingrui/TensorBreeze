@@ -10,12 +10,9 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import contextlib
-import logging
 import threading
 import traceback
 from six.moves import queue as Queue
-
-log = logging.getLogger(__name__)
 
 
 class Coordinator(object):
@@ -24,7 +21,6 @@ class Coordinator(object):
         self._event = threading.Event()
 
     def request_stop(self):
-        log.debug('Coordinator stopping')
         self._event.set()
 
     def should_stop(self):

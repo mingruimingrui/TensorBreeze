@@ -1,6 +1,5 @@
 import sys
 
-import logging
 import threading
 
 import tensorflow as tf
@@ -10,8 +9,6 @@ from ..datasets import WiderDataset
 from ..samplers import DetectionSampler
 from ..collate import ImageCollate
 from .. import transforms
-
-logger = logging.getLogger(__name__)
 
 
 def make_wider_data_loader(

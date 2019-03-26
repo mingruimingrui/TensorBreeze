@@ -1,8 +1,5 @@
-import logging
 import tensorflow as tf
 from ..resnet import load_pretrained_weights as load_pretrained_resnet_weights
-
-logger = logging.getLogger(__name__)
 
 
 def load_pretrained_weights(backbone_type, sess=None, verbosity=0):
@@ -24,7 +21,7 @@ def load_pretrained_weights(backbone_type, sess=None, verbosity=0):
         sess = tf.get_default_session()
 
     if verbosity >= 1:
-        logger.info('Loading pretrained weights')
+        print('Loading pretrained weights')
 
     with tf.variable_scope('backbone'):
         if 'resnet' in backbone_type:
@@ -34,4 +31,4 @@ def load_pretrained_weights(backbone_type, sess=None, verbosity=0):
                 '{} is not a valid backbone type'.format(backbone_type))
 
     if verbosity >= 1:
-        logger.info('Pretrained weights loaded')
+        print('Pretrained weights loaded')

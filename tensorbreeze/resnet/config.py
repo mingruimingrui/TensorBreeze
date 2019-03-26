@@ -1,10 +1,8 @@
 """
 ResNet config system
 """
-import logging
+import warnings
 from ..utils.config_system import ConfigSystem
-
-logger = logging.getLogger(__name__)
 
 _C = ConfigSystem()
 config = _C
@@ -79,7 +77,7 @@ def validate_config(config):
         'FREEZE_AT must be a one of [0, 1, 2, 3, 4, 5]'
 
     if config.FREEZE_BN and config.USE_GN:
-        logger.warn('Normalization layers will not be frozen if using group normalization')
+        warnings.warn('Normalization layers will not be frozen if using group normalization')
 
     if not config.NO_TOP:
         assert config.LAST_CONV == 5, \
