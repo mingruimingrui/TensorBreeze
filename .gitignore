@@ -103,8 +103,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# Sublime Text 3
+# Text editor stuff
 *.sublime-*
+setup.cfg
 
 # Depreciated code
 dep/**
