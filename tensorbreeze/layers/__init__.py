@@ -8,7 +8,7 @@ from ._meter import add_meter_ops, add_meter_dict_ops
 
 # Losses
 from ._focal_loss import focal_loss
-from ._triplet_loss import add_fixed_semi_random_triplet_loss
+from ._triplet_loss import triplet_margin_loss
 
 __all__ = [
     'pad2d',
@@ -18,5 +18,5 @@ __all__ = [
     'add_meter_ops',
     'add_meter_dict_ops',
     'focal_loss',
-    'add_fixed_semi_random_triplet_loss',
+    'triplet_margin_loss',
 ]
