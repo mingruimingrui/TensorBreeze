@@ -4,7 +4,7 @@ from ._anchor import compute_anchors
 
 # Utility functions
 from ._change_format import to_nchw, to_nhwc
-from ._meter import add_meter_ops, add_meter_dict_ops
+from ._meter import meter, meter_dict
 
 # Losses
 from ._focal_loss import focal_loss
@@ -15,8 +15,8 @@ __all__ = [
     'compute_anchors',
     'to_nchw',
     'to_nhwc',
-    'add_meter_ops',
-    'add_meter_dict_ops',
+    'meter',
+    'meter_dict',
     'focal_loss',
     'triplet_margin_loss',
 ]

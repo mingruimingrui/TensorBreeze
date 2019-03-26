@@ -20,10 +20,10 @@ from collections import Mapping
 
 import tensorflow as tf
 
+from tensorbreeze import layers
 from tensorbreeze.data.data_loaders import add_wider_loader_ops
 from tensorbreeze.retinanet import add_retinanet_train_ops
 from tensorbreeze.retinanet import load_pretrained_weights
-from tensorbreeze.layers import add_meter_dict_ops
 from tensorbreeze.utils.context import Session
 from tensorbreeze.utils.logging import setup_logger
 from tensorbreeze.utils.weights_io import save_weights_to_file
@@ -290,7 +290,7 @@ def main_(sess, args):
     loss_dict, retinanet_config = add_loss_fn(batch, args)
     backprop_op = add_backprop_fn(sess, loss_dict, args)
     init_variables(sess, retinanet_config, args)
-    meter_dict, _ = add_meter_dict_ops(
+    meter_dict, _ = layers.meter_dict(
         loss_dict,
         init_values=sess.run(loss_dict)
     )

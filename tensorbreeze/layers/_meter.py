@@ -2,7 +2,7 @@ from collections import Mapping
 import tensorflow as tf
 
 
-def add_meter_ops(
+def meter(
     loss,
     decay=0.01,
     name=None,
@@ -25,7 +25,7 @@ def add_meter_ops(
     return y, y.op
 
 
-def add_meter_dict_ops(
+def meter_dict(
     loss_dict,
     decay=0.01,
     names=None,
