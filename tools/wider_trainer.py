@@ -25,8 +25,8 @@ from tensorbreeze.retinanet import add_retinanet_train_ops
 from tensorbreeze.retinanet import load_pretrained_weights
 from tensorbreeze.layers import add_meter_dict_ops
 from tensorbreeze.utils.context import Session
+from tensorbreeze.utils.logging import setup_logger
 from tensorbreeze.utils.weights_io import save_weights_to_file
-from tensorbreeze.utils.logging import setup_logging
 from tensorbreeze.utils.collect_env import get_pretty_env_info
 
 logger = logging.getLogger(__name__)
@@ -283,7 +283,7 @@ def do_train(
 
 
 def main_(sess, args):
-    setup_logging(os.path.join(args.log_dir, 'train.log'))
+    setup_logger(__name__, os.path.join(args.log_dir, 'train.log'))
 
     # Create all tensors and ops
     batch = add_input_fn(sess, args)

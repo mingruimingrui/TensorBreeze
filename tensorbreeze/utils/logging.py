@@ -1,10 +1,8 @@
 from __future__ import absolute_import
 
-import warnings
 import logging
 
 default_format = '%(asctime)s %(levelname)-4.4s %(filename)s:%(lineno)d: %(message)s'
-warnings.warn('tensorbreeze.utils.logging is depreciated and will be removed soon')
 
 
 def setup_logger(
@@ -34,7 +32,6 @@ def setup_logger(
         # Console handler
         ch = logging.StreamHandler()
         ch.setLevel(level)
-        ch.setFormatter(formatter)
         logger.addHandler(ch)
 
     return logger
