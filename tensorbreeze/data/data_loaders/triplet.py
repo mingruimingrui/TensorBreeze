@@ -34,10 +34,10 @@ def make_triplet_data_loader(
     image_transforms = []
 
     if random_horizontal_flip:
-        image_transforms.append(transforms.RandomHorizontalFlip)
+        image_transforms.append(transforms.RandomHorizontalFlip())
 
     if random_vertical_flip:
-        image_transforms.append(transforms.RandomVerticalFlip)
+        image_transforms.append(transforms.RandomVerticalFlip())
 
     image_transforms += [
         transforms.Resize(size=(int(height), int(width))),
