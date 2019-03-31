@@ -133,19 +133,18 @@ def config_args(args):
 def add_input_fn(sess, args):
     print('Creating data loader thread and processes')
     with tf.device('/cpu:0'):
-        with tf.name_scope('data_loader'):
-            batch = add_coco_loader_ops(
-                sess=sess,
-                root_image_dirs=args.root_image_dirs,
-                ann_files=args.ann_files,
-                batch_size=args.batch_size,
-                num_workers=args.batch_size * 2,
-                drop_no_anns=True,
-                mask=False,
-                min_size=args.min_image_size,
-                max_size=args.max_image_size,
-                random_horizontal_flip=True
-            )
+        batch = add_coco_loader_ops(
+            sess=sess,
+            root_image_dirs=args.root_image_dirs,
+            ann_files=args.ann_files,
+            batch_size=args.batch_size,
+            num_workers=args.batch_size * 2,
+            drop_no_anns=True,
+            mask=False,
+            min_size=args.min_image_size,
+            max_size=args.max_image_size,
+            random_horizontal_flip=True
+        )
     return batch
 
 
