@@ -1,4 +1,6 @@
 from .transforms import (
+    VGG_MEAN,
+    VGG_STD,
     Compose,
     ImageResize,
     RandomCrop,
@@ -9,6 +11,8 @@ from .transforms import (
 )
 
 __all__ = [
+    'VGG_MEAN',
+    'VGG_STD',
     'Compose',
     'ImageResize',
     'RandomCrop',
