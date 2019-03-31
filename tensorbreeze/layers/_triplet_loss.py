@@ -36,7 +36,7 @@ def triplet_margin_loss(
     if use_cosine:
         def dist_fn(labels, preds):
             return tf.losses.cosine_distance(
-                labels, preds,
+                labels, preds, axis=1,
                 reduction=tf.losses.Reduction.NONE
             )
 
@@ -68,7 +68,9 @@ def triplet_margin_loss(
 
         loss = tf.maximum(pdist - ndist + margin, 0)
 
-        if reduction == tf.losses.Reduction.SUM:
+        if reduction == tf.losses.Reduction.NONE:
+            return loss
+        elif reduction == tf.losses.Reduction.SUM:
             return tf.sum(loss)
         elif reduction == tf.losses.Reduction.MEAN:
             return tf.reduce_mean(loss)
