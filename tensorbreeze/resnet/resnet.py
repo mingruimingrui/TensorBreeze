@@ -63,7 +63,7 @@ def add_resnet_ops(x, config_file=None, **kwargs):
         x,
         base_layer_sizes[1],
         data_format=data_format,
-        trainable=config.FREEZE_AT >= 1,
+        trainable=config.FREEZE_AT < 1,
         freeze_bn=config.FREEZE_BN
     )
     C2 = add_maxpool_ops(C1, data_format=data_format)
@@ -77,7 +77,7 @@ def add_resnet_ops(x, config_file=None, **kwargs):
             num_blocks=structure[0],
             stride=1,
             data_format=data_format,
-            trainable=config.FREEZE_AT >= 2,
+            trainable=config.FREEZE_AT < 2,
             freeze_bn=config.FREEZE_BN
         )
 
@@ -93,7 +93,7 @@ def add_resnet_ops(x, config_file=None, **kwargs):
             num_blocks=structure[1],
             stride=2,
             data_format=data_format,
-            trainable=config.FREEZE_AT >= 3,
+            trainable=config.FREEZE_AT < 3,
             freeze_bn=config.FREEZE_BN
         )
 
@@ -109,7 +109,7 @@ def add_resnet_ops(x, config_file=None, **kwargs):
             num_blocks=structure[2],
             stride=2,
             data_format=data_format,
-            trainable=config.FREEZE_AT >= 4,
+            trainable=config.FREEZE_AT < 4,
             freeze_bn=config.FREEZE_BN
         )
 
@@ -125,7 +125,7 @@ def add_resnet_ops(x, config_file=None, **kwargs):
             num_blocks=structure[3],
             stride=2,
             data_format=data_format,
-            trainable=config.FREEZE_AT >= 5,
+            trainable=config.FREEZE_AT < 5,
             freeze_bn=config.FREEZE_BN
         )
 
