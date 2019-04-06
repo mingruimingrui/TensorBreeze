@@ -20,8 +20,7 @@ def add_bottleneck_ops_1(
     residual = x_in
     if downsample:
         with tf.variable_scope('downsample'):
-            residual = tf.layers.conv2d(
-                x_in,
+            residual = tf.keras.layers.Conv2D(
                 dim_out,
                 kernel_size=1,
                 strides=stride,
@@ -30,20 +29,18 @@ def add_bottleneck_ops_1(
                 use_bias=False,
                 trainable=trainable,
                 name='0'
-            )
-            residual = tf.layers.batch_normalization(
-                residual,
+            )(x_in)
+            residual = tf.keras.layers.BatchNormalization(
                 axis=channel_axis,
                 momentum=0.1,
                 epsilon=1e-5,
                 trainable=trainable and not freeze_bn,
                 name='1'
-            )
+            )(residual)
 
     # 3x3 BN ReLU
     x_a = layers.pad2d(x_in, 1)
-    x_a = tf.layers.conv2d(
-        x_a,
+    x_a = tf.keras.layers.Conv2D(
         dim_inner,
         kernel_size=3,
         strides=stride,
@@ -52,21 +49,19 @@ def add_bottleneck_ops_1(
         use_bias=False,
         trainable=trainable,
         name='conv1'
-    )
-    x_a = tf.layers.batch_normalization(
-        x_a,
+    )(x_a)
+    x_a = tf.keras.layers.BatchNormalization(
         axis=channel_axis,
         momentum=0.1,
         epsilon=1e-5,
         trainable=trainable and not freeze_bn,
         name='bn1'
-    )
+    )(x_a)
     x_a = tf.nn.relu(x_a)
 
     # 3x3 BN
     x_b = layers.pad2d(x_a, 1)
-    x_b = tf.layers.conv2d(
-        x_b,
+    x_b = tf.keras.layers.Conv2D(
         dim_out,
         kernel_size=3,
         strides=1,
@@ -75,15 +70,14 @@ def add_bottleneck_ops_1(
         use_bias=False,
         trainable=trainable,
         name='conv2'
-    )
-    x_b = tf.layers.batch_normalization(
-        x_b,
+    )(x_b)
+    x_b = tf.keras.layers.BatchNormalization(
         axis=channel_axis,
         momentum=0.1,
         epsilon=1e-5,
         trainable=trainable and not freeze_bn,
         name='bn2'
-    )
+    )(x_b)
 
     # Sum and ReLU
     x_out = tf.math.add(residual, x_b, name='sum')
@@ -108,8 +102,7 @@ def add_bottleneck_ops_2(
     residual = x_in
     if downsample:
         with tf.variable_scope('downsample'):
-            residual = tf.layers.conv2d(
-                x_in,
+            residual = tf.keras.layers.Conv2D(
                 dim_out,
                 kernel_size=1,
                 strides=stride,
@@ -118,19 +111,17 @@ def add_bottleneck_ops_2(
                 use_bias=False,
                 trainable=trainable,
                 name='0'
-            )
-            residual = tf.layers.batch_normalization(
-                residual,
+            )(x_in)
+            residual = tf.keras.layers.BatchNormalization(
                 axis=channel_axis,
                 momentum=0.1,
                 epsilon=1e-5,
                 trainable=trainable and not freeze_bn,
                 name='1'
-            )
+            )(residual)
 
     # 1x1 BN ReLU
-    x_a = tf.layers.conv2d(
-        x_in,
+    x_a = tf.keras.layers.Conv2D(
         dim_inner,
         kernel_size=1,
         strides=1,
@@ -139,21 +130,19 @@ def add_bottleneck_ops_2(
         use_bias=False,
         trainable=trainable,
         name='conv1'
-    )
-    x_a = tf.layers.batch_normalization(
-        x_a,
+    )(x_in)
+    x_a = tf.keras.layers.BatchNormalization(
         axis=channel_axis,
         momentum=0.1,
         epsilon=1e-5,
         trainable=trainable and not freeze_bn,
         name='bn1'
-    )
+    )(x_a)
     x_a = tf.nn.relu(x_a)
 
     # 3x3 BN ReLU
     x_b = layers.pad2d(x_a, 1)
-    x_b = tf.layers.conv2d(
-        x_b,
+    x_b = tf.keras.layers.Conv2D(
         dim_inner,
         kernel_size=3,
         strides=stride,
@@ -162,20 +151,18 @@ def add_bottleneck_ops_2(
         use_bias=False,
         trainable=trainable,
         name='conv2'
-    )
-    x_b = tf.layers.batch_normalization(
-        x_b,
+    )(x_b)
+    x_b = tf.keras.layers.BatchNormalization(
         axis=channel_axis,
         momentum=0.1,
         epsilon=1e-5,
         trainable=trainable and not freeze_bn,
         name='bn2'
-    )
+    )(x_b)
     x_b = tf.nn.relu(x_b)
 
     # 1x1 BN
-    x_c = tf.layers.conv2d(
-        x_b,
+    x_c = tf.keras.layers.Conv2D(
         dim_out,
         kernel_size=1,
         strides=1,
@@ -184,15 +171,14 @@ def add_bottleneck_ops_2(
         use_bias=False,
         trainable=trainable,
         name='conv3'
-    )
-    x_c = tf.layers.batch_normalization(
-        x_c,
+    )(x_b)
+    x_c = tf.keras.layers.BatchNormalization(
         axis=channel_axis,
         momentum=0.1,
         epsilon=1e-5,
         trainable=trainable and not freeze_bn,
         name='bn3'
-    )
+    )(x_c)
 
     # Sum and ReLU
     x_out = tf.math.add(residual, x_c, name='sum')

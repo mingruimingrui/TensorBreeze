@@ -10,7 +10,7 @@ from .config import make_config
 from ._bottleneck import get_add_bottleneck_ops
 from ._stem import add_stem_ops, add_maxpool_ops
 from ._layer import add_layer_ops
-from ._classifier import add_classifier_ops
+from ._head import add_head_ops
 
 base_layer_sizes = {
     1: 64,
@@ -132,8 +132,14 @@ def add_resnet_ops(x, config_file=None, **kwargs):
     if config.NO_TOP and config.LAST_CONV == 5:
         return (C2, C3, C4, C5), config
 
-    return add_classifier_ops(
+    should_config_for_torch = config.NUM_CLASSES == 1000 \
+        and config.LAST_CONV == 5 \
+        and C5.shape[-2] == (7, 7)
+
+    return add_head_ops(
         C5,
         num_classes=config.NUM_CLASSES,
-        data_format=data_format
+        data_format=data_format,
+        activation=config.OUTPUT_ACTIVATION,
+        config_for_torch=should_config_for_torch
     ), config

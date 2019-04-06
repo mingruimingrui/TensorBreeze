@@ -35,6 +35,8 @@ _C.TYPE = 'resnet50'
 # The number of classes to classify
 _C.NUM_CLASSES = 1000
 
+_C.OUTPUT_ACTIVATION = 'softmax'
+
 # If true, uses resnet as a feature extractor, FC layer will not be added
 _C.NO_TOP = False
 
