@@ -53,7 +53,7 @@ def parse_args(args):
         '--max-iter', type=int, default=1440000,
         help='Maximum number of iterations to perform during training')
     parser.add_argument(
-        '--base-lr', type=float, default=0.00001,
+        '--base-lr', type=float, default=1e-6,
         help='Learning rate to use during training, '
         'will be adjusted by batch size, rank and num gpus')
 
