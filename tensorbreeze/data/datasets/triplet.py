@@ -14,7 +14,6 @@ import random
 from PIL import Image
 
 import torch.utils.data
-from torchvision.transforms import Resize
 
 
 def _find_image_files(root):

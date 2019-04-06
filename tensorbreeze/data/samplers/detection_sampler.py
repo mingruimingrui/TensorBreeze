@@ -147,14 +147,14 @@ class DetectionSampler(torch.utils.data.sampler.BatchSampler):
             max_i0 = max(0, len(self.all_idx) - self.batch_size)
             list_i0 = [random.randint(0, max_i0) for _ in range(self.num_iter)]
             groups = [
-                self.all_idx[i0:i0+self.batch_size]
+                self.all_idx[i0:(i0 + self.batch_size)]
                 for i0 in list_i0
             ]
 
         else:
             # Perform normal groupping
             groups = [
-                self.all_idx[i0:i0+self.batch_size]
+                self.all_idx[i0:(i0 + self.batch_size)]
                 for i0 in range(0, len(self.all_idx), self.batch_size)
             ]
 

@@ -52,8 +52,7 @@ def get_image_size(file_path):
             w, h = struct.unpack("<HH", data[6:10])
             width = int(w)
             height = int(h)
-        elif ((size >= 24) and data.startswith(b'\211PNG\r\n\032\n')
-              and (data[12:16] == b'IHDR')):
+        elif ((size >= 24) and data.startswith(b'\211PNG\r\n\032\n') and (data[12:16] == b'IHDR')):
             # PNGs
             w, h = struct.unpack(">LL", data[16:24])
             width = int(w)
@@ -103,9 +102,7 @@ def get_image_size(file_path):
                 # as h is negative when stored upside down
                 height = abs(int(h))
             else:
-                raise UnknownImageFormat(
-                    "Unkown DIB header size:" +
-                    str(headersize))
+                raise UnknownImageFormat("Unkown DIB header size:" + str(headersize))
         elif (size >= 8) and data[:4] in (b"II\052\000", b"MM\000\052"):
             # Standard TIFF, big- or little-endian
             # BigTIFF and other different but TIFF-like formats are not
@@ -148,9 +145,7 @@ def get_image_size(file_path):
                         type = input.read(2)
                         type = struct.unpack(boChar + "H", type)[0]
                         if type not in tiffTypes:
-                            raise UnknownImageFormat(
-                                "Unkown TIFF field type:" +
-                                str(type))
+                            raise UnknownImageFormat("Unkown TIFF field type:" + str(type))
                         typeSize = tiffTypes[type][0]
                         typeChar = tiffTypes[type][1]
                         input.seek(entryOffset + 8)

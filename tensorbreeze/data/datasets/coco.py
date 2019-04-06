@@ -56,8 +56,8 @@ class CocoDataset(DetectionDataset):
             return [ann['segmentation'] for ann in annotation_infos]
 
         coco_cat_ids = self.coco.cats.keys()
-        self.coco_cat_to_contiguous = {coco_i:cont_i for cont_i, coco_i in enumerate(coco_cat_ids)}
-        self.contiguous_to_coco_cat = {cont_i:coco_i for cont_i, coco_i in enumerate(coco_cat_ids)}
+        self.coco_cat_to_contiguous = {coco_i: cont_i for cont_i, coco_i in enumerate(coco_cat_ids)}
+        self.contiguous_to_coco_cat = {cont_i: coco_i for cont_i, coco_i in enumerate(coco_cat_ids)}
 
         self.coco_ids = self.coco.getImgIds()
         self.image_files = [coco_idx_to_image_file(idx) for idx in self.coco_ids]
