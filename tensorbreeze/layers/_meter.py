@@ -46,7 +46,7 @@ def meter_dict(
         else:
             name = None
 
-        meter_dict[key], meter_dict_ops[key] = add_meter_ops(
+        meter_dict[key], meter_dict_ops[key] = meter(
             loss,
             decay=decay,
             name=name,
