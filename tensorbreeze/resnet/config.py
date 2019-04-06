@@ -35,6 +35,8 @@ _C.TYPE = 'resnet50'
 # The number of classes to classify
 _C.NUM_CLASSES = 1000
 
+# The activation to use for output
+# The accepted values are those accepted by tf.keras.layers.Dense
 _C.OUTPUT_ACTIVATION = 'softmax'
 
 # If true, uses resnet as a feature extractor, FC layer will not be added
