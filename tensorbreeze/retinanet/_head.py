@@ -39,8 +39,7 @@ def comb_head(
     # Apply conv layers
     for i in range(num_layers):
         x = layers.pad2d(x, 1)
-        x = tf.layers.conv2d(
-            x,
+        x = tf.keras.layers.Conv2D(
             feature_size,
             kernel_size=3,
             strides=1,
@@ -50,7 +49,7 @@ def comb_head(
             trainable=True,
             name='head/{}'.format(i * 2),
             reuse=reuse
-        )
+        )(x)
         x = tf.nn.relu(x)
 
     # Add outputs
@@ -69,8 +68,7 @@ def comb_head(
         return value
 
     x = layers.pad2d(x, 1)
-    x = tf.layers.conv2d(
-        x,
+    x = tf.keras.layers.Conv2D(
         num_anchors * (total_num_classes + total_num_bbox),
         kernel_size=3,
         strides=1,
@@ -82,7 +80,7 @@ def comb_head(
         reuse=reuse,
         kernel_initializer=tf.random_normal_initializer(stddev=0.01),
         bias_initializer=bias_initializer
-    )
+    )(x)
 
     # Perform some surgery to extract the classification and regression
     # outputs (and background output)
@@ -177,8 +175,7 @@ def cls_head(
     # Apply conv layers
     for i in range(num_layers):
         x = layers.pad2d(x, 1)
-        x = tf.layers.conv2d(
-            x,
+        x = tf.keras.layers.Conv2D(
             feature_size,
             kernel_size=3,
             strides=1,
@@ -188,7 +185,7 @@ def cls_head(
             trainable=True,
             name='head/{}'.format(i * 2),
             reuse=reuse
-        )
+        )(x)
         x = tf.nn.relu(x)
 
     # Add outputs
@@ -206,8 +203,7 @@ def cls_head(
         return value
 
     x = layers.pad2d(x, 1)
-    x = tf.layers.conv2d(
-        x,
+    x = tf.keras.layers.Conv2D(
         output_size,
         kernel_size=3,
         strides=1,
@@ -219,7 +215,7 @@ def cls_head(
         reuse=reuse,
         kernel_initializer=tf.random_normal_initializer(stddev=0.01),
         bias_initializer=bias_initializer
-    )
+    )(x)
 
     # Perform some surgery to extract the classification outputs
     # (and background output)
@@ -300,8 +296,7 @@ def reg_head(
     # Apply conv layers
     for i in range(num_layers):
         x = layers.pad2d(x, 1)
-        x = tf.layers.conv2d(
-            x,
+        x = tf.keras.layers.Conv2D(
             feature_size,
             kernel_size=3,
             strides=1,
@@ -311,12 +306,11 @@ def reg_head(
             trainable=True,
             name='head/{}'.format(i * 2),
             reuse=reuse
-        )
+        )(x)
         x = tf.nn.relu(x)
 
     x = layers.pad2d(x, 1)
-    x = tf.layers.conv2d(
-        x,
+    x = tf.keras.layers.Conv2D(
         num_anchors * (total_num_bbox),
         kernel_size=3,
         strides=1,
@@ -326,7 +320,7 @@ def reg_head(
         trainable=True,
         name='head/{}'.format(num_layers * 2),
         reuse=reuse
-    )
+    )(x)
 
     # Perform some surgery to extract the regression outputs
     regression = x
