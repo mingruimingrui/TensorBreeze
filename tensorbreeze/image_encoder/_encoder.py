@@ -17,23 +17,21 @@ def add_encoder_ops(
 
     # Determine pooling function to use
     if pool_method == 'avg':
-        pooling_fn = tf.layers.average_pooling2d
+        pooling_fn = tf.keras.layers.AveragePooling2D
     else:
-        pooling_fn = tf.layers.max_pooling2d
+        pooling_fn = tf.keras.layers.MaxPooling2D
 
     # Define the encoder ops
     x = pooling_fn(
-        x,
         pool_size=x_size,
         strides=1,
         padding='valid',
         data_format=data_format,
         name='final_pool'
-    )
-    x = tf.layers.flatten(x)
-    x = tf.layers.dense(
-        x,
+    )(x)
+    x = tf.keras.layers.Flatten()(x)
+    x = tf.keras.layers.Dense(
         feature_size,
         name='fc'
-    )
+    )(x)
     return x

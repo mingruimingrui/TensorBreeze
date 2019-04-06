@@ -41,8 +41,7 @@ def add_fpn_ops(input_features, config_file=None, **kwargs):
 
     # Produce MAX_INPUT_LEVEL to MIN_LEVEL
     for level in output_levels_1[::-1]:
-        reduced_features[level] = tf.layers.conv2d(
-            input_features[level],
+        reduced_features[level] = tf.keras.layers.Conv2D(
             config.FEATURE_SIZE,
             kernel_size=1,
             strides=1,
@@ -51,7 +50,7 @@ def add_fpn_ops(input_features, config_file=None, **kwargs):
             use_bias=True,
             trainable=True,
             name='conv_reduce/{}'.format(level)
-        )
+        )(input_features[level])
 
         inner = reduced_features[level]
 
@@ -81,8 +80,7 @@ def add_fpn_ops(input_features, config_file=None, **kwargs):
             inner = tf.math.add(inner, inner_higher)
 
         inner = layers.pad2d(inner, 1)
-        output_features[level] = tf.layers.conv2d(
-            inner,
+        output_features[level] = tf.keras.layers.conv2d(
             config.FEATURE_SIZE,
             kernel_size=3,
             strides=1,
@@ -91,15 +89,14 @@ def add_fpn_ops(input_features, config_file=None, **kwargs):
             use_bias=True,
             trainable=True,
             name='conv/{}'.format(level)
-        )
+        )(inner)
 
     # Produce (MAX_INPUT_LEVEL + 1) to MAX_LEVEL
     for level in output_levels_2:
         inner = output_features[level - 1]
         inner = tf.nn.relu(inner)
         inner = layers.pad2d(inner, 1)
-        output_features[level] = tf.layers.conv2d(
-            inner,
+        output_features[level] = tf.keras.layers.conv2d(
             config.FEATURE_SIZE,
             kernel_size=3,
             strides=2,
@@ -108,6 +105,6 @@ def add_fpn_ops(input_features, config_file=None, **kwargs):
             use_bias=True,
             trainable=True,
             name='conv/{}'.format(level)
-        )
+        )(inner)
 
     return [output_features[level] for level in all_output_levels], config
