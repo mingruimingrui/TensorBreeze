@@ -229,7 +229,7 @@ def do_train(
     loss_op = loss_tensor.op
 
     t0 = time.time()
-    for iter_num in tqdm(range(1, args.max_iter + 1)):
+    for iter_num in tqdm(range(1, args.max_iter + 1), ncols=60):
         batch_time = time.time() - t0
         t0 = time.time()
 

@@ -245,31 +245,31 @@ def do_train(
     loss_dict_ops = {k: v.op for k, v in loss_dict.items()}
 
     t0 = time.time()
-    for iter in tqdm(range(1, args.max_iter + 1)):
+    for iter_num in tqdm(range(1, args.max_iter + 1), ncols=60):
         batch_time = time.time() - t0
         t0 = time.time()
 
-        if iter % logging_period != 0:
+        if iter_num % logging_period != 0:
             sess.run([backprop_op, loss_dict_ops])
 
         else:
             epoch_summaries_buffer, losses, _ = \
                 sess.run([epoch_summaries, loss_dict, backprop_op])
-            summary_writer.add_summary(epoch_summaries_buffer, iter)
+            summary_writer.add_summary(epoch_summaries_buffer, iter_num)
 
             time_elapsed = time.time() - start_training_time
-            avg_batch_time = time_elapsed / iter
-            eta_seconds = (args.max_iter - iter) * avg_batch_time
+            avg_batch_time = time_elapsed / iter_num
+            eta_seconds = (args.max_iter - iter_num) * avg_batch_time
             eta_string = str(datetime.timedelta(seconds=int(eta_seconds)))
             msg = dict()
             msg['eta'] = eta_string
-            msg['iter'] = iter
+            msg['iter'] = iter_num
             msg['batch_time'] = '{:.4f}s ({:.4f}s)'.format(batch_time, avg_batch_time)
             msg['losses'] = losses
             logger.info('{}'.format(msg))
 
-        if iter % checkpoint_period == 0:
-            save_checkpoint(args.checkpoint_dir, iter)
+        if iter_num % checkpoint_period == 0:
+            save_checkpoint(args.checkpoint_dir, iter_num)
 
     save_checkpoint(args.checkpoint_dir, 'final')
     total_training_time = time.time() - start_training_time
