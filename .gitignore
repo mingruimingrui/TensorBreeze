@@ -105,6 +105,7 @@ venv.bak/
 
 # Text editor stuff
 *.sublime-*
+.vscode
 setup.cfg
 
 # Depreciated code
