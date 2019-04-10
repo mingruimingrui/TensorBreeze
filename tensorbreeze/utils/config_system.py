@@ -52,7 +52,7 @@ class ConfigSystem(AttrDict):
                 new_config = json.load(f)
         elif file_name.endswith('.yaml'):
             with open(file_name, 'r') as f:
-                new_config = yaml.load(f)
+                new_config = yaml.safe_load(f)
         else:
             errmsg = '{} is not an accepted file format. Must be either a .json or .yaml file'
             raise ValueError(errmsg.format(file_name))

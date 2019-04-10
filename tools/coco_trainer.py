@@ -107,7 +107,7 @@ def config_args(args):
     """
     if args.yaml_file is not None:
         with open(args.yaml_file, 'r') as f:
-            yaml_configs = yaml.load(f)
+            yaml_configs = yaml.safe_load(f)
         for key, value in yaml_configs.items():
             assert hasattr(args, key), \
                 '{} is an invalid option'.format(key)

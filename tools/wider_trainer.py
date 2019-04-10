@@ -107,7 +107,7 @@ def config_args(args):
     """
     if args.yaml_file is not None:
         with open(args.yaml_file, 'r') as f:
-            yaml_configs = yaml.load(f)
+            yaml_configs = yaml.safe_load(f)
         for key, value in yaml_configs.items():
             assert hasattr(args, key), \
                 '{} is an invalid option'.format(key)
@@ -127,11 +127,17 @@ def config_args(args):
     makedirs(args.log_dir)
     makedirs(args.checkpoint_dir)
 
+    setup_logger(
+        __name__,
+        os.path.join(args.log_dir, 'train.log'),
+        log_to_stdout=True
+    )
+
     return args
 
 
 def add_input_fn(sess, args):
-    print('Creating data loader thread and processes')
+    logger.info('Creating data loader thread and processes')
     with tf.device('/cpu:0'):
         batch = add_wider_loader_ops(
             sess=sess,
@@ -147,7 +153,7 @@ def add_input_fn(sess, args):
 
 
 def add_loss_fn(batch, args):
-    print('Adding model and loss ops')
+    logger.info('Adding model and loss ops')
     with tf.device('/gpu:0'):
         loss_dict, retinanet_config = add_retinanet_train_ops(
             batch['image'],
@@ -158,7 +164,7 @@ def add_loss_fn(batch, args):
 
 
 def add_backprop_fn(sess, loss_dict, args):
-    print('Adding backprop ops')
+    logger.info('Adding backprop ops')
     with tf.device('/gpu:0'):
         lr = args.base_lr * args.batch_size
         opt = tf.train.AdamOptimizer(learning_rate=lr)
@@ -282,8 +288,6 @@ def do_train(
 
 
 def main_(sess, args):
-    setup_logger(__name__, os.path.join(args.log_dir, 'train.log'))
-
     # Create all tensors and ops
     batch = add_input_fn(sess, args)
     loss_dict, retinanet_config = add_loss_fn(batch, args)
