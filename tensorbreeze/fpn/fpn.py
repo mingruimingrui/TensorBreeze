@@ -80,7 +80,7 @@ def add_fpn_ops(input_features, config_file=None, **kwargs):
             inner = tf.math.add(inner, inner_higher)
 
         inner = layers.pad2d(inner, 1)
-        output_features[level] = tf.keras.layers.conv2d(
+        output_features[level] = tf.keras.layers.Conv2D(
             config.FEATURE_SIZE,
             kernel_size=3,
             strides=1,
@@ -96,7 +96,7 @@ def add_fpn_ops(input_features, config_file=None, **kwargs):
         inner = output_features[level - 1]
         inner = tf.nn.relu(inner)
         inner = layers.pad2d(inner, 1)
-        output_features[level] = tf.keras.layers.conv2d(
+        output_features[level] = tf.keras.layers.Conv2D(
             config.FEATURE_SIZE,
             kernel_size=3,
             strides=2,
