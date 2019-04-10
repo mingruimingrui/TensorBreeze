@@ -23,7 +23,7 @@ def load_pretrained_weights(backbone_type, sess=None, verbosity=0):
     if verbosity >= 1:
         print('Loading pretrained weights')
 
-    with tf.variable_scope('backbone'):
+    with tf.variable_scope('backbone/'):
         if 'resnet' in backbone_type:
             load_pretrained_resnet_weights(backbone_type, sess, verbosity=0)
         else:
